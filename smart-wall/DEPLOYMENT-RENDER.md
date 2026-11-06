@@ -1,6 +1,6 @@
 # Free Render + MongoDB Atlas deployment
 
-Status: source prepared and locally tested; not yet deployed. No SmartWall GitHub repository or Atlas cluster was available when preparation began. Render is connected to the owner account. Stay on free plans; do not add a card, paid disk, cron, Redis or Render Postgres.
+Status: source uploaded to https://github.com/atharva1232/Smart-Wall. One free service is created at https://dashboard.render.com/web/srv-dbmt4d3rjlhs73cdtmm0. Its first cloud build passed; startup awaits the owner-entered Atlas connection and JWT secret. The owner confirmed that Atlas Free is ready. No live deployment is claimed yet. Stay on free plans; do not add a card, paid disk, cron, Redis or Render Postgres.
 
 ## Owner setup
 
@@ -48,3 +48,5 @@ Render Free sleeps after 15 idle minutes and wakes on a request; waking can take
 The 53 backend tests cover complete image decoding, rejection of truncated original/preview content before media writes, matching photo/preview dimensions, explicit proxy trust and independent client rate limits. Existing password hashes are unchanged. Runtime image decoding and password hashing use conservative concurrency settings for the small free instance. Production dependencies were checked with npm audit --omit=dev; zero reported advisories at preparation time. A real cloud deploy, Atlas connection, proxy-chain check and restart/persistence checks remain pending until the owner account setup is complete.
 
 References checked 6 November 2026: https://render.com/docs/free, https://render.com/docs/environment-variables, https://render.com/docs/deploy-node-express-app, https://www.mongodb.com/docs/atlas/connect-to-database-deployment/.
+
+Startup now reuses identical MongoDB validators without collMod; a real schema change still requires an operator migration and fails rather than disabling validation. Current service auto-deploy is off while private configuration is completed. No duplicate service has been created.
