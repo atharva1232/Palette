@@ -1,0 +1,254 @@
+<header class="navbar">
+  <button class="brand" type="button" (click)="navigate('home')"><span class="brand-icon" aria-hidden="true">◈</span>{{ settings().siteName }}</button>
+  <nav aria-label="Main navigation">
+    <button type="button" [class.active]="page === 'home'" [attr.aria-current]="page === 'home' ? 'page' : null" (click)="navigate('home')">Home</button>
+    <button type="button" [class.active]="page === 'visualize'" [attr.aria-current]="page === 'visualize' ? 'page' : null" (click)="navigate('visualize')">Visualize</button>
+    <button type="button" [class.active]="page === 'shades'" [attr.aria-current]="page === 'shades' ? 'page' : null" (click)="navigate('shades')">Shades</button>
+    <button type="button" [class.active]="page === 'patterns'" [attr.aria-current]="page === 'patterns' ? 'page' : null" (click)="navigate('patterns')">Patterns</button>
+    @if (!displayName) {
+      <button type="button" (click)="navigate('login')">Log in</button>
+      <button class="button primary small" type="button" (click)="navigate('signup')">Get started</button>
+    } @else {
+      <button type="button" (click)="navigate('dashboard')">Dashboard</button>
+      @if (auth.user()?.role === 'admin') { <button type="button" (click)="navigate('admin')">Admin</button> }
+      <button type="button" [disabled]="auth.busy()" (click)="logout()">Log out</button>
+    }
+  </nav>
+</header>
+<main>
+  @if (settings().maintenance) { <p class="verification-banner" role="status">We're updating the studio. Some services may be temporarily interrupted.</p> }
+  @if (page === 'admin' && auth.user()?.role === 'admin') { <app-admin-panel /> }
+  @if (page === 'help') { <app-user-guide /> }
+  @if (auth.emailEnabled() && auth.user()?.emailVerified === false) { <div class="verification-banner"><span>Verify {{ auth.user()?.email }} to save photos to your account and share patterns. You can keep exploring and editing.</span><button type="button" [disabled]="auth.busy()" (click)="resendVerification()">Resend verification email</button>@if (auth.notice() && page !== 'forgot' && page !== 'verify' && page !== 'reset') { <p role="status">{{ auth.notice() }}</p> }</div> }
+  @if (page === 'forgot' || page === 'verify' || page === 'reset') { <app-account-access [mode]="page" [token]="accountLinkToken" (returnToLogin)="navigate(auth.user() ? 'dashboard' : 'login')" /> }
+  @if (page === 'feedback') { <app-trial-feedback /> }
+
+  @if (auth.error() && page !== 'login' && page !== 'signup') { <p class="account-error" role="alert">{{ auth.error() }}</p> }
+  <!-- After its first visit, keep the editor mounted to preserve the photo and selection. -->
+  @if (visualizerOpened) { <app-visualizer [hidden]="page !== 'visualize'" /> }
+  <ng-template #roomPreview let-background="background">
+    <div class="room photo-room">
+      <img class="room-photo" src="images/lounge.jpg" width="1600" height="1067" alt="Bright furnished living room with a grey sofa, glass coffee table and an accent wall" fetchpriority="high" />
+      <svg class="wall-overlay" [class.original]="showOriginal" viewBox="0 0 1600 1067" aria-hidden="true">
+        <defs><mask id="accent-wall-mask">
+          <path fill="white" d="M684 184 1600 5V795L1530 795 1530 815 1320 860 1310 770 1285 704 1276 660 1250 646 890 626 861 636 852 686 797 705 797 738 684 699Z" />
+          <path fill="black" d="M960 490 1168 474 1176 577 962 572Z" />
+          <path fill="black" d="M722 610 760 612 751 668 760 677 757 712 730 715 726 754 719 754 723 710 718 707Z" />
+          <path fill="none" stroke="black" stroke-width="15" d="M680 646V433M680 435 739 414M680 435 630 414M680 435 595 428" />
+        </mask></defs>
+        <foreignObject width="1600" height="1067" mask="url(#accent-wall-mask)"><div xmlns="http://www.w3.org/1999/xhtml" class="wall-paint" [style.background]="background"></div></foreignObject>
+      </svg>
+      <span class="room-label">{{ showOriginal ? 'The original room' : 'Your accent wall, reimagined' }}</span>
+      <button class="compare-button" type="button" [attr.aria-pressed]="showOriginal" (click)="showOriginal = !showOriginal">{{ showOriginal ? 'See your design ◈' : 'View original ↔' }}</button>
+    </div>
+  </ng-template>
+  @if (page === 'home') {
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">A LITTLE COLOUR. A WHOLE NEW FEELING.</span>
+        <h1>A fresh look starts with a <em>little colour.</em></h1>
+        <p class="description">A quiet corner. A bold first impression. A room that feels completely you. Discover colours and patterns that turn a space into your place.</p>
+        <div class="hero-actions">
+          <button class="button primary" type="button" (click)="navigate('visualize')">Visualize your room →</button>
+          <button class="button secondary" type="button" (click)="navigate('patterns')">Discover patterns</button>
+        </div>
+        <div class="steps"><span>01 · Find your shade</span><span>02 · Make it yours</span><span>03 · Preview the feeling</span></div>
+        <p class="muted">Try a real room, find your feeling, and follow a little inspiration.</p>
+      </div>
+      <div class="preview-card">
+        <ng-container *ngTemplateOutlet="roomPreview; context: { background: selectedColor }" />
+        <div class="palette">
+          <h2>Find your favourite shade</h2><p>Click a colour to preview it.</p>
+          <div class="swatches">
+            @for (color of colors; track color.hex) {
+              <button class="swatch" type="button" [style.backgroundColor]="color.hex" [class.selected]="selectedColor === color.hex" [attr.aria-label]="color.name" [attr.aria-pressed]="selectedColor === color.hex" [title]="color.name" (click)="selectedColor = color.hex"></button>
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="decorative-ribbon" aria-hidden="true"><span>COLOUR OUTSIDE THE ORDINARY</span><i>✳</i><span>A LITTLE PATTERN, A LOT OF PERSONALITY</span><i>✳</i><span>MAKE YOURSELF AT HOME</span></div>
+    <section class="editorial-section moods-section">
+      <div class="editorial-heading"><div><span class="eyebrow">A MOOD FOR EVERY ROOM</span><h2>What does home <em>feel</em> like?</h2></div><p>There’s no right colour. Just the one that makes you want to stay a little longer.</p></div>
+      <div class="mood-grid">@for (mood of moods; track mood.name) {
+        <button class="mood-card" type="button" (click)="openMood(mood)">
+          <span class="mood-photo"><img [src]="mood.image" [style.object-position]="mood.position" alt="Neutral living-room inspiration" loading="lazy" width="600" height="700" /><span class="mood-wash" [style.background]="mood.shade"></span><span class="mood-number">{{ mood.number }} / THE MOOD EDIT</span><span class="mood-arrow">↗</span></span>
+          <span class="mood-palette">@for (colour of mood.colours; track colour) { <i [style.background]="colour"></i> }</span>
+          <strong>{{ mood.name }}</strong><span class="mood-note">{{ mood.note }}</span>
+        </button>
+      }</div>
+    </section>
+    <section class="visualizer-feature" aria-labelledby="visualizer-feature-title">
+      <div class="feature-workspace">
+        <div class="feature-window">
+          <div class="feature-toolbar"><span><i></i><i></i><i></i></span><span>SMARTWALL / COLOUR STUDIO</span><span aria-hidden="true">↗</span></div>
+          <div class="feature-photo">
+            <img src="images/lounge.jpg" width="1600" height="1067" loading="lazy" alt="Compare the original living room with a new colour on its accent wall" />
+            <svg class="wall-overlay feature-overlay" [style.clip-path]="'inset(0 0 0 ' + featureReveal + '%)'" viewBox="0 0 1600 1067" aria-hidden="true">
+              <defs><mask id="feature-wall-mask">
+                <path fill="white" d="M684 184 1600 5V795L1530 795 1530 815 1320 860 1310 770 1285 704 1276 660 1250 646 890 626 861 636 852 686 797 705 797 738 684 699Z" />
+                <path fill="black" d="M960 490 1168 474 1176 577 962 572Z" />
+                <path fill="black" d="M722 610 760 612 751 668 760 677 757 712 730 715 726 754 719 754 723 710 718 707Z" />
+                <path fill="none" stroke="black" stroke-width="15" d="M680 646V433M680 435 739 414M680 435 630 414M680 435 595 428" />
+              </mask></defs>
+              <foreignObject width="1600" height="1067" mask="url(#feature-wall-mask)"><div xmlns="http://www.w3.org/1999/xhtml" class="feature-paint" [style.background]="featureColor"></div></foreignObject>
+            </svg>
+            <span class="feature-photo-label before-label">BEFORE</span><span class="feature-photo-label after-label">YOUR NEW LOOK</span>
+            <span class="feature-divider" [style.left.%]="featureReveal" aria-hidden="true"><span>↔</span></span>
+          </div>
+          <div class="feature-comparison"><label for="feature-compare">A little slide. A big difference.</label><input id="feature-compare" type="range" min="0" max="100" [(ngModel)]="featureReveal" aria-label="Compare original and painted room" [attr.aria-valuetext]="featureReveal + '% original room'" /></div>
+        </div>
+        <span class="feature-note">Your room. A fresh perspective. <span aria-hidden="true">⤴</span></span>
+        <span class="feature-spark" aria-hidden="true">✳</span>
+      </div>
+      <div class="feature-copy">
+        <span class="eyebrow">IMAGINE IT. PREVIEW IT. LOVE IT.</span>
+        <h2 id="visualizer-feature-title">Same room.<br>A whole new <em>feeling.</em></h2>
+        <p>What if that wall was a little bolder? A little softer? Play with a shade here, then bring your own room into the picture.</p>
+        <div class="feature-shades" aria-label="Preview a wall colour">@for (shade of featureShades; track shade.hex) {
+          <button type="button" [class.chosen]="featureColor === shade.hex" [attr.aria-pressed]="featureColor === shade.hex" (click)="featureColor = shade.hex"><i [style.background]="shade.hex" aria-hidden="true"></i>{{ shade.name }}</button>
+        }</div>
+        <div class="feature-steps"><span><b>01</b> Upload your room</span><span><b>02</b> Select your wall</span><span><b>03</b> Find your colour</span></div>
+        <button class="button primary" type="button" (click)="navigate('visualize')">Try your room in the visualizer ↗</button>
+        <span class="feature-privacy">Just your photo and a little imagination. Edit privately. Save your favourites to your account.</span>
+      </div>
+    </section>
+    <section class="editorial-section pattern-edit">
+      <div class="editorial-heading"><div><span class="eyebrow">SMALL DETAILS. BIG PERSONALITY.</span><h2>Meet your wall’s <em>new muse.</em></h2></div><button class="text-button" type="button" (click)="navigate('patterns')">All {{ starterPatterns.length }} patterns ↗</button></div>
+      <div class="featured-patterns">@for (pattern of featuredPatterns; track pattern.id) { <button class="featured-pattern" type="button" (click)="openPattern(pattern)"><span class="featured-tile" [style.background]="patternBackground(pattern)"><span>TRY IT ↗</span></span><strong>{{ pattern.name }}</strong><span>{{ pattern.style }} / Customise your colours</span></button> }</div>
+    </section>
+    <section class="home-band">
+      <div><span class="eyebrow">BEYOND A SINGLE COLOUR</span><h2>Walls with a little personality.</h2><p>Soft stripes, playful dots, quiet geometry. Find a pattern you love, or create one of your own.</p></div>
+      <button class="button light" type="button" (click)="navigate('patterns')">Find your pattern ↗</button>
+    </section>
+    <section class="editorial-section process-section">
+      <div class="editorial-heading"><div><span class="eyebrow">FROM “WHAT IF” TO “THAT’S THE ONE”</span><h2>A fresh perspective,<br>in <em>three little steps.</em></h2></div><p>No paintbrush required. Just a little curiosity and a colour you can’t stop thinking about.</p></div>
+      <div class="process-grid"><article><span>01</span><div class="process-icon" aria-hidden="true">◒</div><h3>Follow a feeling.</h3><p>Browse {{ shades.length }} shades, from grounding earth tones to colours that make a statement.</p><button class="text-button" type="button" (click)="navigate('shades')">Find your shade →</button></article><article><span>02</span><div class="process-icon" aria-hidden="true">✳</div><h3>Play with the details.</h3><p>Try arches, petals, or a timeless stripe. Make it yours with colours and scale.</p><button class="text-button" type="button" (click)="navigate('patterns')">Try a pattern →</button></article><article><span>03</span><div class="process-icon" aria-hidden="true">⌂</div><h3>See the possibility.</h3><p>Upload your room, select its wall, and preview your favourite shade. Compare with the original before you decide.</p><button class="text-button" type="button" (click)="navigate('visualize')">Try your own room →</button></article></div>
+    </section>
+    <section class="faq-section"><div><span class="eyebrow">A FEW THINGS YOU MIGHT WONDER</span><h2>A little clarity,<br>before you <em>create.</em></h2><span class="faq-flower" aria-hidden="true">✳</span></div><div class="faq-list"><details><summary>Can I try colours on my own room?</summary><p>Yes. Open Visualize, upload a JPG, PNG, or WebP photo, outline only the wall and choose Set wall boundary, then click bare wall with Smart select. Adjust edge tolerance or use Erase to protect objects, try a shade, and download the preview. Editing stays in your browser; saving while logged in stores a private copy in your account.</p></details><details><summary>Can I change the colours in a pattern?</summary><p>Absolutely. Open Patterns, choose a design, and select Customise this pattern. Change the background, pattern colour, style, and scale, then save your version.</p></details><details><summary>Will the paint look exactly like the preview?</summary><p>The photo preview is an impression of your idea. Lighting, screens, wall texture, and paint finish affect the final result. Try a physical paint sample before decorating.</p></details><details><summary>Can other people use my pattern?</summary><p>Yes. Saved patterns appear in the shared collection for people using this same app server. Log in to publish; your account name appears beside your design.</p></details></div></section>
+    <section class="closing-note"><span class="eyebrow">YOUR SPACE. YOUR STORY.</span><h2>Good things start<br>with a <em>little colour.</em></h2><button class="button light" type="button" (click)="navigate('shades')">Let’s find yours ↗</button><span class="closing-doodle" aria-hidden="true">✳</span></section>
+  }
+  @if (page === 'shades') {
+    <section class="collection">
+      <div class="collection-heading"><div><span class="eyebrow">THE COLOUR LIBRARY · {{ shades.length }} SHADES</span><h1>Find your kind of colour.</h1><p class="description">From barely-there neutrals to rich, expressive tones. Pick a shade and see your room in a new light.</p></div><span class="edition">THE SMARTWALL COLLECTION<br>Thoughtfully coloured. Endlessly yours.</span></div>
+      <div class="studio-layout">
+        <div class="library">
+          <label class="search-label" for="shade-search">Search the collection</label>
+          <input id="shade-search" type="search" placeholder="Try sage, maroon, or a hex code…" [(ngModel)]="shadeSearch" />
+          <div class="filters" aria-label="Colour families">@for (item of families; track item) { <button type="button" [class.chosen]="family === item" [attr.aria-pressed]="family === item" (click)="family = item">{{ item }}</button> }</div>
+          @if (auth.user()) { <label><input type="checkbox" [(ngModel)]="favouritesOnly" /> Show my favourite shades</label> }
+          <p class="results" aria-live="polite">{{ filteredShades.length }} shades to explore</p>
+          <div class="shade-grid">
+            @for (shade of filteredShades; track shade.id) {
+              <button type="button" class="shade-card" [class.chosen]="selectedShade.id === shade.id" [attr.aria-pressed]="selectedShade.id === shade.id" (click)="selectedColor = shade.hex; selectedShadeId = shade.id">
+                <span class="shade-paint" [style.background]="shade.hex"><span class="selection-mark" [class.visible]="selectedColor === shade.hex">✓</span></span>
+                <span class="shade-name">{{ shade.name }}</span><span class="shade-code">{{ shade.hex.toUpperCase() }}</span>
+              </button>
+            } @empty { <div class="empty-state"><h2>No shades found.</h2><p>Try another colour name or clear your filters.</p><button class="button secondary" (click)="shadeSearch = ''; family = 'All shades'; favouritesOnly = false">Show all shades</button></div> }
+          </div>
+        </div>
+        <aside class="preview-card studio-preview">
+          <div class="preview-heading"><span class="eyebrow">LIVE ROOM PREVIEW</span><span>01 / COLOUR</span></div>
+          <ng-container *ngTemplateOutlet="roomPreview; context: { background: selectedColor }" />
+          <div class="palette" aria-live="polite"><span class="eyebrow">YOUR SELECTED SHADE</span><h2>{{ selectedShade.name }}</h2><p>{{ selectedColor.toUpperCase() }} · {{ selectedShade.family }}</p><p>{{ selectedShade.brand }} · {{ selectedShade.finishes.join(' / ') }}</p>@if (auth.user() && selectedShade.id) { <button type="button" class="text-button" (click)="catalogue.toggle('colour', selectedShade.id)">{{ catalogue.favourites().includes('colour:' + selectedShade.id) ? 'Remove favourite' : 'Save favourite shade' }}</button> }<p class="preview-note">An on-screen impression. Real paint will vary with light and finish.</p></div>
+        </aside>
+      </div>
+    </section>
+  }
+  @if (page === 'patterns') {
+    <section class="collection">
+      <div class="collection-heading"><div><span class="eyebrow">THE PATTERN STUDIO</span><h1>A little more character.</h1><p class="description">Give your walls a rhythm of their own. Try a favourite, change the details, or add something for everyone to enjoy.</p></div><button class="button primary" type="button" (click)="editPattern()">＋ Create a pattern</button></div>
+      <p class="status-message" role="status">{{ patternMessage() }}</p>
+      <div class="studio-layout">
+        <div class="library">
+          @if (showPatternBuilder) {
+            <section class="pattern-builder" aria-labelledby="builder-title">
+              <div class="section-title"><h2 id="builder-title">Make it your own.</h2><button class="text-button" type="button" [disabled]="savingPattern()" (click)="showPatternBuilder = false">Cancel</button></div>
+              <p class="muted">Your design will appear in the shared collection for everyone using this app.</p>
+              <form #patternForm="ngForm" (ngSubmit)="addPattern(patternForm)" novalidate>
+                <label for="pattern-name">Pattern name</label><input id="pattern-name" name="patternName" [(ngModel)]="draft.name" #patternName="ngModel" required pattern=".*\S.*" maxlength="60" placeholder="Give your design a name" />
+                @if (patternName.invalid && patternName.touched) { <small class="error">Please give your pattern a name.</small> }
+                <p class="muted">{{ auth.user() ? 'Published as ' + displayName : 'Log in to share this design. Your draft will stay here.' }}</p>@if (!auth.user()) { <button class="text-button" type="button" (click)="navigate('login')">Log in to publish →</button> }
+                <div class="builder-fields"><div><label for="pattern-style">Pattern style</label><select id="pattern-style" name="style" [(ngModel)]="draft.style">@for (style of patternStyles; track style) { <option [value]="style">{{ style }}</option> }</select></div><div><label for="pattern-scale">Scale · {{ draft.scale }} px</label><input id="pattern-scale" name="scale" type="range" min="16" max="96" step="4" [(ngModel)]="draft.scale" /></div></div>
+                <div class="builder-fields"><div><label for="base-colour">Background colour</label><input id="base-colour" name="base" type="color" [(ngModel)]="draft.base" /></div><div><label for="ink-colour">Pattern colour</label><input id="ink-colour" name="ink" type="color" [(ngModel)]="draft.ink" /></div></div>
+                <button class="button primary full" type="submit" [disabled]="savingPattern()">{{ savingPattern() ? 'Adding your pattern…' : 'Add to shared collection ↗' }}</button>
+              </form>
+            </section>
+          }
+          <div class="section-title"><h2>The studio collection</h2><span class="muted">{{ starterPatterns.length }} original designs</span></div>
+          <div class="pattern-grid">@for (pattern of starterPatterns; track pattern.id) {
+            <button type="button" class="pattern-card" [class.chosen]="selectedPattern.id === pattern.id" [attr.aria-pressed]="selectedPattern.id === pattern.id" (click)="selectedPattern = pattern; showPatternBuilder = false">
+              <span class="pattern-sample" [style.background]="patternBackground(pattern)"></span><span class="pattern-info"><strong>{{ pattern.name }}</strong><span>{{ pattern.style }} · By {{ pattern.author }}</span></span>
+            </button>
+          }</div>
+          <div class="section-title community-title"><div><span class="eyebrow">MADE BY YOU</span><h2>The shared collection</h2></div><button class="text-button" type="button" [disabled]="patternsLoading()" (click)="loadPatterns()">Refresh ↻</button></div>
+          @if (patternsLoading()) { <p class="muted" role="status">Loading shared patterns…</p> }
+          @if (patternsError()) { <p class="error" role="alert">{{ patternsError() }}</p> }
+          <div class="pattern-grid">@for (pattern of communityPatterns(); track pattern.id) {
+            <button type="button" class="pattern-card" [class.chosen]="selectedPattern.id === pattern.id" [attr.aria-pressed]="selectedPattern.id === pattern.id" (click)="selectedPattern = pattern; showPatternBuilder = false">
+              <span class="pattern-sample" [style.background]="patternBackground(pattern)"></span><span class="pattern-info"><strong>{{ pattern.name }}</strong><span>{{ pattern.style }} · By {{ pattern.author }}</span></span>
+            </button>
+          } @empty { @if (!patternsLoading() && !patternsError()) { <div class="empty-state"><h3>The first pattern could be yours.</h3><p>Create a design and give someone else a little inspiration.</p></div> } }</div>
+        </div>
+        <aside class="preview-card studio-preview">
+          <div class="preview-heading"><span class="eyebrow">LIVE ROOM PREVIEW</span><span>02 / PATTERN</span></div>
+          <ng-container *ngTemplateOutlet="roomPreview; context: { background: patternBackground(showPatternBuilder ? draft : selectedPattern) }" />
+          <div class="palette" aria-live="polite"><span class="eyebrow">{{ showPatternBuilder ? 'YOUR DESIGN IN PROGRESS' : 'YOUR SELECTED PATTERN' }}</span><h2>{{ showPatternBuilder ? (draft.name || 'An original, by you.') : selectedPattern.name }}</h2>@if (auth.user() && !showPatternBuilder) { <button type="button" class="text-button" (click)="catalogue.toggle('pattern', selectedPattern.id)">{{ catalogue.favourites().includes('pattern:' + selectedPattern.id) ? 'Remove favourite' : 'Save favourite pattern' }}</button> }<p>{{ showPatternBuilder ? draft.style : selectedPattern.style }} · {{ showPatternBuilder ? draft.scale : selectedPattern.scale }} px repeat</p>@if (!showPatternBuilder) { <button class="button secondary full" type="button" (click)="editPattern()">Customise this pattern →</button><button type="button" class="button primary full" (click)="tryPatternOnPhoto()">Try on my photo →</button>@if (auth.user() && selectedPattern.ownerId === auth.user()?.id) { <button class="text-button" type="button" (click)="patternToDelete = selectedPattern.id">Delete my pattern</button>@if (patternToDelete === selectedPattern.id) { <p>Delete this shared pattern? This cannot be undone.</p><button class="button secondary" type="button" (click)="deletePattern(selectedPattern.id)">Confirm deletion</button><button class="text-button" type="button" (click)="patternToDelete = ''">Cancel</button> } } }</div>
+        </aside>
+      </div>
+    </section>
+  }
+  @if (page === 'login' || page === 'signup') {
+    <section class="auth-section"><div class="auth-card">
+      <span class="eyebrow">WELCOME TO SMARTWALL</span>
+      <h1>{{ page === 'login' ? 'Welcome back.' : 'Make room for colour.' }}</h1>
+      @if (auth.error()) { <p class="error" role="alert">{{ auth.error() }}</p> }
+      <p class="demo-note">Save your room designs privately and return to them whenever inspiration strikes.</p>
+      @if (page === 'login') {
+        <form #loginForm="ngForm" (ngSubmit)="submitLogin(loginForm)" novalidate>
+          <label for="login-email">Email address</label>
+          <input id="login-email" name="email" type="email" maxlength="254" autocomplete="username" placeholder="you@example.com" [(ngModel)]="login.email" #loginEmail="ngModel" required email />
+          @if (loginEmail.invalid && loginEmail.touched) { <small class="error">Enter a valid email address.</small> }
+          <label for="login-password">Password</label>
+          <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" [(ngModel)]="login.password" #loginPassword="ngModel" required minlength="8" maxlength="128" />
+          @if (loginPassword.invalid && loginPassword.touched) { <small class="error">Enter at least 8 characters.</small> }
+          <button class="button primary full" type="submit" [disabled]="auth.busy() || !auth.ready()">{{ auth.busy() ? 'Logging in…' : 'Log in →' }}</button>@if (auth.emailEnabled()) { <button class="text-button" type="button" (click)="navigate('forgot')">Forgot your password?</button> }
+          <p class="switch-text">New here? <button type="button" (click)="navigate('signup')">Create an account</button></p>
+        </form>
+      } @else {
+        <form #signupForm="ngForm" (ngSubmit)="submitSignup(signupForm)" novalidate>
+          <label for="signup-name">Full name</label>
+          <input id="signup-name" name="name" type="text" maxlength="80" autocomplete="name" placeholder="Your name" [(ngModel)]="signup.name" #signupName="ngModel" required pattern=".*\S.*" />
+          @if (signupName.invalid && signupName.touched) { <small class="error">Enter your name.</small> }
+          <label for="signup-email">Email address</label>
+          <input id="signup-email" name="email" type="email" maxlength="254" autocomplete="email" placeholder="you@example.com" [(ngModel)]="signup.email" #signupEmail="ngModel" required email />
+          @if (signupEmail.invalid && signupEmail.touched) { <small class="error">Enter a valid email address.</small> }
+          <label for="signup-password">Password</label>
+          <input id="signup-password" name="password" type="password" autocomplete="new-password" placeholder="At least 8 characters" [(ngModel)]="signup.password" #signupPassword="ngModel" required minlength="8" maxlength="128" />
+          @if (signupPassword.invalid && signupPassword.touched) { <small class="error">Enter at least 8 characters.</small> }
+          <label for="confirm-password">Confirm password</label>
+          <input id="confirm-password" name="confirmPassword" type="password" autocomplete="new-password" placeholder="Repeat your password" [(ngModel)]="signup.confirmPassword" #confirmation="ngModel" required />
+          @if (confirmation.touched && (!signup.confirmPassword || signup.password !== signup.confirmPassword)) { <small class="error">Passwords must match.</small> }
+          <button class="button primary full" type="submit" [disabled]="auth.busy() || !auth.ready()">{{ auth.busy() ? 'Creating account…' : 'Create account →' }}</button>
+          <p class="switch-text">Already have an account? <button type="button" (click)="navigate('login')">Log in</button></p>
+        </form>
+      }
+    </div></section>
+  }
+  @if (page === 'dashboard') {
+    <section class="dashboard">
+      <span class="eyebrow">YOUR CREATIVE SPACE</span><h1>Hello, {{ displayName }}.</h1>
+      <p class="description">Your saved rooms and shared patterns, all in one place.</p>
+      <p>{{ auth.user()?.email }} · {{ accountStats().patterns }} shared patterns</p>@if (statsError()) { <p role="alert">{{ statsError() }} <button type="button" class="text-button" (click)="loadAccountStats()">Retry</button></p>}
+      <div class="dashboard-grid">
+        <article class="feature-card"><span class="feature-icon" aria-hidden="true">◈</span><h2>Explore colours</h2><p>Find your favourite in our collection of {{ shades.length }} shades.</p><button class="button primary" type="button" (click)="navigate('shades')">Open colour library</button></article>
+        <article class="feature-card"><span class="tag">Ready to try</span><h2>Upload your room</h2><p>Upload a photo, select a wall, and preview your chosen paint colour.</p><button class="button primary" type="button" (click)="navigate('visualize')">Visualize your room</button></article>
+        <article class="feature-card"><span class="tag">{{ accountStats().designs }} saved</span><h2>Your wall designs</h2><p>Reopen your room photos, try another shade, or manage your saved designs.</p><button class="button primary" type="button" (click)="openSavedGallery()">Open saved designs</button></article>
+      </div>
+      <section aria-label="Your favourites"><h2>Your favourite shades &amp; patterns</h2><p>Saved to your account so you can return to an idea.</p><div class="filters">@for (c of favouriteShades; track c.id) { <button type="button" (click)="selectedColor=c.hex; selectedShadeId=c.id; family='All shades'; shadeSearch=''; navigate('shades')">{{ c.name }}</button> } @for (p of favouritePatterns; track p.id) { <button type="button" (click)="openPattern(p)">{{ p.name }}</button> } @if (!favouriteShades.length && !favouritePatterns.length) { <p>No favourites yet. Save a favourite in Shades or Patterns.</p> }</div></section>
+    </section>
+  }
+</main>
+<footer class="site-footer"><div class="footer-top"><div><button class="brand" type="button" (click)="navigate('home')">◈ {{ settings().siteName }}</button><p>A little inspiration for the places<br>we call our own.</p></div><div><span class="eyebrow">COME EXPLORE</span><button type="button" (click)="navigate('home')">Home</button><button type="button" (click)="navigate('visualize')">Visualize your room</button><button type="button" (click)="navigate('shades')">The shade library</button><button type="button" (click)="navigate('patterns')">The pattern studio</button><button type="button" (click)="navigate('help')">How to use SmartWall</button><button type="button" (click)="navigate('feedback')">Share trial feedback</button></div><div><span class="eyebrow">MADE FOR YOUR IMAGINATION</span><p>{{ shades.length }} shades. {{ starterPatterns.length }} original patterns.<br>Endless ways to make it yours.</p><p class="photo-credit">Room photos: <a href="https://unsplash.com/photos/gray-sofa-near-white-wall--TiONiwniJs" target="_blank" rel="noopener noreferrer">Zac Gudakov</a> &amp; <a href="https://unsplash.com/photos/gray-cushion-couch-beside-white-wall-qY3pLOIpt4w" target="_blank" rel="noopener noreferrer">dix sept</a> / Unsplash</p></div></div><div class="footer-bottom"><span>SmartWall · Imagine your space in colour.</span><span>Designed for a home that feels like you.</span></div></footer>
+
+

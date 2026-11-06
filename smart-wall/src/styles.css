@@ -1,0 +1,11 @@
+@import './studio.css';
+@import './home.css';
+@import './upload-banner.css';
+*, *::before, *::after { box-sizing: border-box; }
+:root { --ivory: #fbf6f2; --ink: #3b202a; --sage: #713343; --sage-light: #f4e5e7; --maroon: #713343; --gold: #b77188; --gold-light: #f5e6dc; --muted: #806b72; --border: #eadbda; }
+body { margin: 0; font-family: Arial, Helvetica, sans-serif; background: var(--ivory); }
+button, input { font-family: inherit; }
+
+
+
+

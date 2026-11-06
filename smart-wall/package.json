@@ -1,0 +1,58 @@
+{
+  "name": "smart-wall",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "node scripts/dev.mjs",
+    "backup": "node scripts/mongo-backup.mjs",
+    "start:api": "node scripts/mean-server.mjs",
+    "test:api": "node --test server/*.test.mjs",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "start:production": "node scripts/mean-server.mjs --production",
+    "mail:inbox": "node scripts/mail-inbox.mjs",
+    "trial:report": "node scripts/mongo-trial-report.mjs",
+    "check:release": "node scripts/release-check.mjs",
+    "admin:grant": "node scripts/grant-admin.mjs",
+    "test:mean": "node --test server/mean.test.mjs",
+    "mail:setup:gmail": "node scripts/gmail-setup.mjs",
+    "mail:check": "node scripts/gmail-setup.mjs --check"
+  },
+  "private": true,
+  "packageManager": "npm@11.13.0",
+  "dependencies": {
+    "@angular/common": "^22.2.0",
+    "@angular/compiler": "^22.2.0",
+    "@angular/core": "^22.2.0",
+    "@angular/forms": "^22.2.0",
+    "@angular/platform-browser": "^22.2.0",
+    "@angular/router": "^22.2.0",
+    "express": "^5.3.0",
+    "jose": "^6.2.13",
+    "mongodb": "^6.21.0",
+    "nodemailer": "^10.2.1",
+    "rxjs": "~7.8.0",
+    "sharp": "^0.35.5",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^22.2.4",
+    "@angular/cli": "^22.2.4",
+    "@angular/compiler-cli": "^22.2.0",
+    "@types/express": "^5.0.6",
+    "jsdom": "^30.0.0",
+    "mongodb-memory-server": "^10.4.3",
+    "prettier": "^3.8.1",
+    "typescript": "~6.0.2",
+    "vitest": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=24.16.0 <25"
+  },
+  "overrides": {
+    "@angular/build": {
+      "vite": "^8.3.5"
+    }
+  }
+}

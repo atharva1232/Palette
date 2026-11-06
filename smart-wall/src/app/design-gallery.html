@@ -1,0 +1,19 @@
+<section class="saved-gallery" aria-labelledby="saved-designs-title">
+  <div class="gallery-heading"><div><span class="eyebrow">YOUR IDEAS, KEPT CLOSE</span><h2 id="saved-designs-title">Your saved wall designs.</h2><p>{{ store.accountName() ? 'Private designs saved to your account. Log in from another device to find them here.' : 'Guest saves stay in this browser on this device. Log in to import them into an account.' }}</p></div><span class="design-count">{{ designs().length }} saved</span></div>
+  @if (store.accountName() && store.localCount()) { <p>Found {{ store.localCount() }} existing browser saves. <button type="button" [disabled]="busy()" (click)="importLocal()">Import browser saves into my account</button></p> }
+  @if (error()) { <p class="gallery-error" role="alert">{{ error() }} <button type="button" (click)="refresh()" [disabled]="busy()">Retry</button></p> }
+  @if (message()) { <p role="status">{{ message() }}</p> }
+  @if (busy()) { <p role="status">Updating your gallery…</p> }
+  @if (designs().length) {
+    <div class="gallery-actions"><button type="button" [disabled]="busy()" (click)="selectAll()">{{ selected().length === designs().length ? 'Deselect all' : 'Select all' }}</button><span>{{ selected().length }} selected</span><button type="button" [disabled]="!selected().length || busy()" (click)="requestDelete(selected())">Delete selected</button><button type="button" [disabled]="busy()" (click)="requestDelete(allIds())">Delete everything</button></div>
+    @if (pendingDelete().length) {
+      <div class="delete-confirmation" role="group" aria-label="Confirm deletion"><p>Delete {{ pendingDelete().length }} saved design{{ pendingDelete().length === 1 ? '' : 's' }}, including their room photos? This cannot be undone. Your currently open edit stays available.</p><button type="button" [disabled]="busy()" (click)="confirmDelete()">Yes, delete {{ pendingDelete().length }}</button><button type="button" [disabled]="busy()" (click)="pendingDelete.set([])">Cancel</button></div>
+    }
+    <div class="design-grid">@for (design of designs(); track design.id) {
+      <article class="design-card" [class.selected]="selected().includes(design.id)">
+        <div class="saved-images"><img [src]="design.previewUrl" [alt]="design.name + ' painted preview'" loading="lazy" /><details><summary>Original photo</summary><img [src]="design.photoUrl" [alt]="design.name + ' original room'" loading="lazy" /></details></div>
+        <div class="design-details"><label><input type="checkbox" [checked]="selected().includes(design.id)" [disabled]="busy()" (change)="toggle(design.id)" /><strong>{{ design.name }}</strong></label><span class="design-meta"><i [style.background]="design.color"></i>{{ design.color.toUpperCase() }} · {{ design.savedAt | date:'mediumDate' }}</span><div class="card-actions"><button type="button" [disabled]="busy()" (click)="open(design.id)">Open &amp; edit ↗</button><button type="button" [disabled]="busy()" [attr.aria-label]="'Delete ' + design.name" (click)="requestDelete([design.id])">Delete</button></div></div>
+      </article>
+    }</div>
+  } @else if (!busy() && !error()) { <div class="gallery-empty"><span aria-hidden="true">⌂</span><h3>A home for your favourite ideas.</h3><p>Upload a room photo and choose Save design. Come back here to compare your ideas or keep creating.</p></div> }
+</section>

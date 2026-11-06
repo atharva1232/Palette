@@ -1,0 +1,558 @@
+{
+  "colours": [
+    {
+      "name": "Velvet Maroon",
+      "hex": "#713343",
+      "family": "Reds & pinks",
+      "id": "shade-1",
+      "brand": "SmartWall concept palette",
+      "finishes": [
+        "Matte",
+        "Satin",
+        "Gloss"
+      ],
+      "tags": [
+        "Reds & pinks"
+      ]
+    },
+    {
+      "name": "Mulberry",
+      "hex": "#512536",
+      "family": "Reds & pinks",
+      "id": "shade-2",
+      "brand": "SmartWall concept palette",
+      "finishes": [
+        "Matte",
+        "Satin",
+        "Gloss"
+      ],
+      "tags": [
+        "Reds & pinks"
+      ]
+    },
+    {
+      "name": "Dusty Rose",
+      "hex": "#c58e96",
+      "family": "Reds & pinks",
+      "id": "shade-3",
+      "brand": "SmartWall concept palette",
+      "finishes": [
+        "Matte",
+        "Satin",
+        "Gloss"
+      ],
+      "tags": [
+        "Reds & pinks"
+      ]
+    },
+    {
+      "name": "Petal Pink",
+      "hex": "#ebcbd0",
+      "family": "Reds & pinks",
+      "id": "shade-4",
+      "brand": "SmartWall concept palette",
+      "finishes": [
+        "Matte",
+        "Satin",
+        "Gloss"
+      ],
+      "tags": [
+        "Reds & pinks"
+      ]
+    },
+    {
+      "name": "Terracotta",
+      "hex": "#b9674d",
+      "family": "Earth tones",
+      "id": "shade-5",
+      "brand": "SmartWall concept palette",
+      "finishes": [
+        "Matte",
+        "Satin",
+        "Gloss"
+      ],
+      "tags": [
+        "Earth tones"
+      ]
+    },
+    {
+      "name": "Clay",
+      "hex": "#cb947b",
+      "family": "Earth tones",
+      "id": "shade-6",
+      "brand": "SmartWall concept palette",
+      "finishes": [
+        "Matte",
+        "Satin",
+        "Gloss"
+      ],
+      "tags": [
+        "Earth tones"
+      ]
+    },
+    {
+      "name": "Burnt Sienna",
+      "hex": "#92513d",
+      "family": "Earth tones",
+      "id": "shade-7",
+      "brand": "SmartWall concept palette",
+      "finishes": [
+        "Matte",
+        "Satin",
+        "Gloss"
+      ],
+      "tags": [
+        "Earth tones"
+      ]
+    },
+    {
+      "name": "Warm Sand",
+      "hex": "#d6bea0",
+      "family": "Earth tones",
+      "id": "shade-8",
+      "brand": "SmartWall concept palette",
+      "finishes": [
+        "Matte",
+        "Satin",
+        "Gloss"
+      ],
+      "tags": [
+        "Earth tones"
+      ]
+    },
+    {
+      "name": "Ivory",
+      "hex": "#f0e8db",
+      "family": "Neutrals",
+      "id": "shade-9",
+      "brand": "SmartWall concept palette",
+      "finishes": [
+        "Matte",
+        "Satin",
+        "Gloss"
+      ],
+      "tags": [
+        "Neutrals"
+      ]
+    },
+    {
+      "name": "Warm Beige",
+      "hex": "#dfcbb3",
+      "family": "Neutrals",
+      "id": "shade-10",
+      "brand": "SmartWall concept palette",
+      "finishes": [
+        "Matte",
+        "Satin",
+        "Gloss"
+      ],
+      "tags": [
+        "Neutrals"
+      ]
+    },
+    {
+      "name": "Linen",
+      "hex": "#cec3b3",
+      "family": "Neutrals",
+      "id": "shade-11",
+      "brand": "SmartWall concept palette",
+      "finishes": [
+        "Matte",
+        "Satin",
+        "Gloss"
+      ],
+      "tags": [
+        "Neutrals"
+      ]
+    },
+    {
+      "name": "Charcoal",
+      "hex": "#424047",
+      "family": "Neutrals",
+      "id": "shade-12",
+      "brand": "SmartWall concept palette",
+      "finishes": [
+        "Matte",
+        "Satin",
+        "Gloss"
+      ],
+      "tags": [
+        "Neutrals"
+      ]
+    },
+    {
+      "name": "Sage Green",
+      "hex": "#b8c9ae",
+      "family": "Greens",
+      "id": "shade-13",
+      "brand": "SmartWall concept palette",
+      "finishes": [
+        "Matte",
+        "Satin",
+        "Gloss"
+      ],
+      "tags": [
+        "Greens"
+      ]
+    },
+    {
+      "name": "Olive Grove",
+      "hex": "#7b8256",
+      "family": "Greens",
+      "id": "shade-14",
+      "brand": "SmartWall concept palette",
+      "finishes": [
+        "Matte",
+        "Satin",
+        "Gloss"
+      ],
+      "tags": [
+        "Greens"
+      ]
+    },
+    {
+      "name": "Forest",
+      "hex": "#36584c",
+      "family": "Greens",
+      "id": "shade-15",
+      "brand": "SmartWall concept palette",
+      "finishes": [
+        "Matte",
+        "Satin",
+        "Gloss"
+      ],
+      "tags": [
+        "Greens"
+      ]
+    },
+    {
+      "name": "Eucalyptus",
+      "hex": "#8eafa0",
+      "family": "Greens",
+      "id": "shade-16",
+      "brand": "SmartWall concept palette",
+      "finishes": [
+        "Matte",
+        "Satin",
+        "Gloss"
+      ],
+      "tags": [
+        "Greens"
+      ]
+    },
+    {
+      "name": "Ocean Blue",
+      "hex": "#9ebbd0",
+      "family": "Blues",
+      "id": "shade-17",
+      "brand": "SmartWall concept palette",
+      "finishes": [
+        "Matte",
+        "Satin",
+        "Gloss"
+      ],
+      "tags": [
+        "Blues"
+      ]
+    },
+    {
+      "name": "Midnight",
+      "hex": "#344b67",
+      "family": "Blues",
+      "id": "shade-18",
+      "brand": "SmartWall concept palette",
+      "finishes": [
+        "Matte",
+        "Satin",
+        "Gloss"
+      ],
+      "tags": [
+        "Blues"
+      ]
+    },
+    {
+      "name": "Coastal Mist",
+      "hex": "#c6dce0",
+      "family": "Blues",
+      "id": "shade-19",
+      "brand": "SmartWall concept palette",
+      "finishes": [
+        "Matte",
+        "Satin",
+        "Gloss"
+      ],
+      "tags": [
+        "Blues"
+      ]
+    },
+    {
+      "name": "Slate Blue",
+      "hex": "#72869c",
+      "family": "Blues",
+      "id": "shade-20",
+      "brand": "SmartWall concept palette",
+      "finishes": [
+        "Matte",
+        "Satin",
+        "Gloss"
+      ],
+      "tags": [
+        "Blues"
+      ]
+    },
+    {
+      "name": "Lavender",
+      "hex": "#bdb4d3",
+      "family": "Purples",
+      "id": "shade-21",
+      "brand": "SmartWall concept palette",
+      "finishes": [
+        "Matte",
+        "Satin",
+        "Gloss"
+      ],
+      "tags": [
+        "Purples"
+      ]
+    },
+    {
+      "name": "Plum",
+      "hex": "#76506e",
+      "family": "Purples",
+      "id": "shade-22",
+      "brand": "SmartWall concept palette",
+      "finishes": [
+        "Matte",
+        "Satin",
+        "Gloss"
+      ],
+      "tags": [
+        "Purples"
+      ]
+    },
+    {
+      "name": "Lilac Haze",
+      "hex": "#dbcee2",
+      "family": "Purples",
+      "id": "shade-23",
+      "brand": "SmartWall concept palette",
+      "finishes": [
+        "Matte",
+        "Satin",
+        "Gloss"
+      ],
+      "tags": [
+        "Purples"
+      ]
+    },
+    {
+      "name": "Aubergine",
+      "hex": "#4d354f",
+      "family": "Purples",
+      "id": "shade-24",
+      "brand": "SmartWall concept palette",
+      "finishes": [
+        "Matte",
+        "Satin",
+        "Gloss"
+      ],
+      "tags": [
+        "Purples"
+      ]
+    },
+    {
+      "name": "Honey",
+      "hex": "#cba454",
+      "family": "Yellows",
+      "id": "shade-25",
+      "brand": "SmartWall concept palette",
+      "finishes": [
+        "Matte",
+        "Satin",
+        "Gloss"
+      ],
+      "tags": [
+        "Yellows"
+      ]
+    },
+    {
+      "name": "Buttercream",
+      "hex": "#eedaa4",
+      "family": "Yellows",
+      "id": "shade-26",
+      "brand": "SmartWall concept palette",
+      "finishes": [
+        "Matte",
+        "Satin",
+        "Gloss"
+      ],
+      "tags": [
+        "Yellows"
+      ]
+    },
+    {
+      "name": "Golden Ochre",
+      "hex": "#b58c40",
+      "family": "Yellows",
+      "id": "shade-27",
+      "brand": "SmartWall concept palette",
+      "finishes": [
+        "Matte",
+        "Satin",
+        "Gloss"
+      ],
+      "tags": [
+        "Yellows"
+      ]
+    },
+    {
+      "name": "Pale Sunshine",
+      "hex": "#f2e8bb",
+      "family": "Yellows",
+      "id": "shade-28",
+      "brand": "SmartWall concept palette",
+      "finishes": [
+        "Matte",
+        "Satin",
+        "Gloss"
+      ],
+      "tags": [
+        "Yellows"
+      ]
+    }
+  ],
+  "patterns": [
+    {
+      "id": "pinstripe",
+      "name": "The Burgundy Stripe",
+      "author": "SmartWall",
+      "style": "Stripes",
+      "base": "#f1e1d7",
+      "ink": "#713343",
+      "scale": 40,
+      "description": "The Burgundy Stripe repeating wall motif",
+      "category": "Stripes"
+    },
+    {
+      "id": "diagonal",
+      "name": "Rose in Motion",
+      "author": "SmartWall",
+      "style": "Diagonal",
+      "base": "#ecd6d4",
+      "ink": "#a26a76",
+      "scale": 48,
+      "description": "Rose in Motion repeating wall motif",
+      "category": "Diagonal"
+    },
+    {
+      "id": "dots",
+      "name": "Sunday Confetti",
+      "author": "SmartWall",
+      "style": "Dots",
+      "base": "#f0e8db",
+      "ink": "#92513d",
+      "scale": 32,
+      "description": "Sunday Confetti repeating wall motif",
+      "category": "Dots"
+    },
+    {
+      "id": "grid",
+      "name": "Quiet Geometry",
+      "author": "SmartWall",
+      "style": "Grid",
+      "base": "#dfe5dc",
+      "ink": "#6e8170",
+      "scale": 48,
+      "description": "Quiet Geometry repeating wall motif",
+      "category": "Grid"
+    },
+    {
+      "id": "checker",
+      "name": "Cocoa Check",
+      "author": "SmartWall",
+      "style": "Checkerboard",
+      "base": "#e8d6c2",
+      "ink": "#876657",
+      "scale": 64,
+      "description": "Cocoa Check repeating wall motif",
+      "category": "Checkerboard"
+    },
+    {
+      "id": "blue-stripe",
+      "name": "Coastal Lines",
+      "author": "SmartWall",
+      "style": "Stripes",
+      "base": "#e4e9e5",
+      "ink": "#72869c",
+      "scale": 56,
+      "description": "Coastal Lines repeating wall motif",
+      "category": "Stripes"
+    },
+    {
+      "id": "deco-arches",
+      "name": "Deco After Dark",
+      "author": "SmartWall",
+      "style": "Arches",
+      "base": "#432433",
+      "ink": "#d3ac77",
+      "scale": 64,
+      "description": "Deco After Dark repeating wall motif",
+      "category": "Arches"
+    },
+    {
+      "id": "blush-petals",
+      "name": "Blush Botanica",
+      "author": "SmartWall",
+      "style": "Petals",
+      "base": "#f5e4df",
+      "ink": "#b77188",
+      "scale": 72,
+      "description": "Blush Botanica repeating wall motif",
+      "category": "Petals"
+    },
+    {
+      "id": "terracotta-tide",
+      "name": "Terracotta Tide",
+      "author": "SmartWall",
+      "style": "Scallops",
+      "base": "#f0d8c0",
+      "ink": "#b9674d",
+      "scale": 48,
+      "description": "Terracotta Tide repeating wall motif",
+      "category": "Scallops"
+    },
+    {
+      "id": "gilded-diamonds",
+      "name": "Gilded Hour",
+      "author": "SmartWall",
+      "style": "Diamonds",
+      "base": "#f4ead8",
+      "ink": "#b58c40",
+      "scale": 64,
+      "description": "Gilded Hour repeating wall motif",
+      "category": "Diamonds"
+    },
+    {
+      "id": "sage-weave",
+      "name": "Sage Atelier",
+      "author": "SmartWall",
+      "style": "Crosshatch",
+      "base": "#e7e9dc",
+      "ink": "#7b8256",
+      "scale": 40,
+      "description": "Sage Atelier repeating wall motif",
+      "category": "Crosshatch"
+    },
+    {
+      "id": "rose-chevron",
+      "name": "Rose Chevron",
+      "author": "SmartWall",
+      "style": "Chevron",
+      "base": "#ead4d6",
+      "ink": "#87465a",
+      "scale": 64,
+      "description": "Rose Chevron repeating wall motif",
+      "category": "Chevron"
+    }
+  ]
+}

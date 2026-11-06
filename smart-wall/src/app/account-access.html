@@ -1,0 +1,18 @@
+<section class="access-page"><div class="access-card">
+  <span class="eyebrow">YOUR SMARTWALL ACCOUNT</span>
+  <h1>{{ mode() === 'forgot' ? 'A fresh start.' : mode() === 'verify' ? 'Make it official.' : 'Your next password.' }}</h1>
+  @if (auth.error()) { <p class="error" role="alert">{{ auth.error() }}</p> }
+  @if (complete()) { <p class="success" role="status">{{ message() }}</p><button type="button" class="primary" (click)="returnToLogin.emit()">Continue →</button> }
+  @else if (mode() === 'forgot') {
+    <p>Enter your account email. We’ll send a link to choose a new password.</p>
+    <form #form="ngForm" (ngSubmit)="submit(form)" novalidate><label for="recovery-email">Email address</label><input id="recovery-email" name="email" type="email" required email maxlength="254" autocomplete="email" [(ngModel)]="email" #address="ngModel" />@if (address.invalid && address.touched) { <small class="error">Enter a valid email address.</small> }<button class="primary" type="submit" [disabled]="auth.busy()">{{ auth.busy() ? 'Requesting link…' : 'Send reset link →' }}</button></form>
+  } @else if (!token()) {
+    <p class="error">Open the full link from your email to continue. If it has expired, request a new one.</p><button type="button" (click)="returnToLogin.emit()">Back to account</button>
+  } @else if (mode() === 'verify') {
+    <p>Confirm that this email address belongs to you. Verification lets you share your patterns with the community.</p><button class="primary" type="button" [disabled]="auth.busy()" (click)="submit()">{{ auth.busy() ? 'Verifying…' : 'Verify my email →' }}</button>
+  } @else {
+    <p>Choose a password of 8–128 characters. This link works once and expires after 30 minutes.</p>
+    <form #form="ngForm" (ngSubmit)="submit(form)" novalidate><label for="reset-password">New password</label><input id="reset-password" name="password" type="password" required minlength="8" maxlength="128" autocomplete="new-password" [(ngModel)]="password" #secret="ngModel" />@if (secret.invalid && secret.touched) { <small class="error">Enter 8–128 characters.</small> }<label for="reset-confirmation">Confirm new password</label><input id="reset-confirmation" name="confirmation" type="password" required maxlength="128" autocomplete="new-password" [(ngModel)]="confirmation" #confirm="ngModel" />@if (confirm.touched && (!confirmation || confirmation !== password)) { <small class="error">Passwords must match.</small> }<button class="primary" type="submit" [disabled]="auth.busy()">{{ auth.busy() ? 'Updating password…' : 'Set new password →' }}</button></form>
+  }
+  <button type="button" class="text" (click)="returnToLogin.emit()">{{ auth.user() ? 'Back to dashboard' : 'Back to login' }}</button>
+</div></section>

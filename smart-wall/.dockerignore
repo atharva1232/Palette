@@ -1,0 +1,10 @@
+node_modules
+dist
+.git
+.data
+.backups
+.angular
+.env
+.env.*
+review
+coverage

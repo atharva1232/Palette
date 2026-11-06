@@ -1,0 +1,20 @@
+import { deploymentSettings } from '../server/deployment.mjs';
+import './local-env.mjs';
+import { connectMongo, migrateSqlite } from '../server/mongo.mjs';
+import { createMeanApi } from '../server/mean-api.mjs';
+import { scheduledMongoBackups } from '../server/mongo-backup.mjs';
+import { resolve } from 'node:path';
+const production = process.argv.includes('--production') || process.env.NODE_ENV === 'production';
+const { origin, proxyHops } = deploymentSettings(process.env, production);
+if (production && (!process.env.MONGODB_URI || !process.env.JWT_SECRET || !origin)) throw new Error('Set MONGODB_URI, JWT_SECRET and HTTPS APP_ORIGIN.');
+const store = await connectMongo({ uri: process.env.MONGODB_URI, name: process.env.MONGODB_DATABASE || 'smartwall', directory: resolve(process.env.DATA_DIRECTORY || '.data'), local: !production });
+await migrateSqlite(store, resolve(process.env.LEGACY_SQLITE_PATH || '.data/smartwall.sqlite'));
+const server = await createMeanApi({ store, production, origin, proxyHops, emailEnabled: process.env.ENABLE_EMAIL_FEATURES === 'true', secret: process.env.JWT_SECRET, frontend: production ? 'dist/smart-wall/browser' : undefined });
+// Render Free disks are ephemeral; durable backups must be configured in Atlas/off-host.
+const backups = process.env.LOCAL_BACKUPS_ENABLED === 'false' ? { async run() {}, async stop() {} } : scheduledMongoBackups(store, resolve(process.env.BACKUP_DIR || '.backups'), { hours:Number(process.env.BACKUP_INTERVAL_HOURS || 24), retain:Number(process.env.BACKUP_RETAIN || 7) });
+await backups.run();
+let stopping = false;
+const stop = () => { if (stopping) return; stopping = true; server.close(); server.resourcesClosed.then(async () => { await backups.stop(); await store.close(); }); setTimeout(() => server.closeAllConnections(), 5000).unref(); };
+for (const signal of ['SIGINT','SIGTERM']) process.on(signal, stop);
+server.on('error', async error => { console.error(error.message); await server.mail.stop(); await store.close(); process.exitCode = 1; });
+server.listen(Number(process.env.PORT || 3001), process.env.HOST || (production ? '0.0.0.0' : '127.0.0.1'), () => console.log('SmartWall MEAN API ready: Express + MongoDB + JWT'));

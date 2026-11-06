@@ -1,0 +1,187 @@
+<section class="visualizer-page" (dragover)="$event.preventDefault()" (drop)="dropFile($event)">
+
+  <input #photoInput class="file-input" type="file" accept="image/jpeg,image/png,image/webp" aria-label="Choose a room photo" (change)="chooseFile($event)" />
+
+  <div class="visualizer-heading">
+
+    <div><span class="eyebrow">THE ROOM VISUALIZER</span><h1>Your room.<br>Your <em>next colour.</em></h1><p>Upload a photo, outline your wall, and try a fresh shade before you pick up a paintbrush.</p></div>
+
+    <div class="privacy-note"><span aria-hidden="true">⌂</span><strong>Your photo stays with you.</strong><p>Editing happens in your browser. Save design stores your photo and design in your account. Authorised admin reviews for support are logged.</p></div>
+
+  </div>
+
+  <div class="upload-banner"><span class="banner-upload-icon" aria-hidden="true">↥</span><div><strong>{{ hasImage() ? 'Want to try another room?' : 'Start by uploading your room' }}</strong><p>JPG, PNG, or WebP · Up to 15 MB · Use photos you own or have permission to use</p></div><button class="action-button primary-action upload-cta" type="button" [disabled]="loading()" (click)="photoInput.click()">{{ hasImage() ? 'Upload another photo ↗' : 'Upload your photo ↗' }}</button></div>
+
+  <div class="visualizer-steps" aria-label="How it works"><span [class.done]="hasImage()"><b>01</b> Upload photo</span><span [class.done]="boundaryReady()"><b>02</b> Lock wall boundary</span><span [class.done]="hasSelection()"><b>03</b> Smart select &amp; colour</span></div>
+
+  <a class="gallery-jump" href="#saved-designs-title">Your saved designs ↓</a>
+
+  @if (error()) { <p class="visualizer-error" role="alert">{{ error() }}</p> }
+
+  @if (loading()) { <p class="visualizer-message" role="status">Opening your photo…</p> }
+
+  @if (!hasImage()) {
+
+    <div class="upload-zone" [class.drag-over]="draggingFile" (dragover)="draggingFile = true; $event.preventDefault()" (dragleave)="draggingFile = false">
+
+      <span class="upload-symbol" aria-hidden="true">↥</span><span class="eyebrow">START WITH YOUR SPACE</span><h2>A new look starts here.</h2><p>Drop a room photo here, or choose one from your device.</p>
+
+      <button class="action-button primary-action upload-cta" type="button" [disabled]="loading()" (click)="photoInput.click()">Upload room photo ↗</button><small>JPG, PNG, or WebP · Up to 15 MB</small>
+
+      <div class="sample-option"><span>No photo handy?</span><button type="button" class="text-action" [disabled]="loading()" (click)="sample()">Try the sample room →</button></div>
+
+    </div>
+
+  }
+
+  <div class="visualizer-workspace" [hidden]="!hasImage()">
+
+    <div class="image-editor">
+
+      <div class="editor-heading"><div><strong>{{ fileName() }}</strong><span>{{ imageWidth() }} × {{ imageHeight() }} preview</span></div><button type="button" class="action-button secondary-action" [disabled]="loading()" (click)="photoInput.click()">↥ Change room photo</button></div>
+
+      <div class="selection-tools" role="group" aria-label="Wall selection tools">
+
+        <button type="button" [class.selected]="tool === 'outline'" [attr.aria-pressed]="tool === 'outline'" [disabled]="loading()" (click)="selectTool('outline')">◇ Outline boundary</button>
+
+        <button type="button" [class.selected]="tool === 'smart'" [attr.aria-pressed]="tool === 'smart'" [disabled]="!boundaryReady() || loading()" (click)="selectTool('smart')">✧ Smart select</button>
+
+        <button type="button" [class.selected]="tool === 'brush'" [attr.aria-pressed]="tool === 'brush'" [disabled]="!wallDetected() || loading()" (click)="selectTool('brush')">＋ Restore paint</button>
+
+        <button type="button" [class.selected]="tool === 'erase'" [attr.aria-pressed]="tool === 'erase'" [disabled]="!hasSelection() || loading()" (click)="selectTool('erase')">− Erase</button>
+
+        <button type="button" [disabled]="(!canUndo() && !points.length) || loading()" (click)="undo()">↶ Undo</button>
+
+        <button type="button" [disabled]="(!boundaryReady() && !points.length) || loading()" (click)="clearSelection()">Reset walls</button>
+
+      </div>
+
+      <div class="selection-instructions" id="selection-help">
+
+        @if (tool === 'outline') { <span>Outline only the wall. Keep ceiling, floor, and furniture outside; then set the boundary.</span> }
+
+        @else if (tool === 'smart') { <span>Click bare wall inside the boundary. Connected colours and edges help exclude frames and furniture.</span> }
+
+        @else { <label for="brush-size">{{ tool === 'erase' ? 'Eraser' : 'Brush' }} size · {{ brushSize }} px</label><input id="brush-size" type="range" min="8" max="160" step="4" [(ngModel)]="brushSize" /><span>{{ tool === 'erase' ? 'Protect an object or tidy an edge.' : 'Restore erased paint only within the detected wall.' }}</span> }
+
+      </div>
+
+      @if (boundaryReady()) { <div class="boundary-controls"><strong>✓ Wall boundary locked</strong><label><input type="checkbox" [(ngModel)]="showBoundary" (ngModelChange)="render()" /> Show boundary</label><span>All painting stays inside this outline.</span></div> }
+
+      <div class="canvas-stage" [class.loading-photo]="loading()">
+
+        <canvas #preview tabindex="0" role="img" [attr.aria-label]="original ? 'Original room photo' : 'Room preview. Use the outline tool to select a wall.'" aria-describedby="selection-help keyboard-help" (pointerdown)="pointerDown($event)" (pointermove)="pointerMove($event)" (pointerup)="pointerUp($event)" (pointercancel)="pointerUp($event)" (keydown)="keyboard($event)">Your browser needs canvas support to display the room preview.</canvas>
+
+        <span class="canvas-view-label">{{ original ? 'ORIGINAL PHOTO' : hasSelection() ? 'WALL-ONLY COLOUR PREVIEW' : boundaryReady() ? 'CLICK THE BARE WALL' : 'OUTLINE A WALL BOUNDARY' }}</span>
+
+      </div>
+
+      @if (points.length) {
+
+        <div class="outline-actions"><span>{{ points.length }} corners marked</span><button type="button" class="action-button primary-action" [disabled]="points.length < 3 || loading()" (click)="finishWall()">Set wall boundary ✓</button><button type="button" class="text-action" (click)="cancelOutline()">Cancel outline</button></div>
+
+      }
+
+      <div class="editor-bottom"><button type="button" class="action-button secondary-action" [disabled]="!hasSelection() || loading()" [attr.aria-pressed]="original" (click)="compare()">{{ original ? 'Show painted room' : 'Compare with original ↔' }}</button><span>{{ hasSelection() ? 'Wall selected · object edges protected' : boundaryReady() ? 'Click the wall with Smart select to start painting.' : 'Outline a wall boundary to begin.' }}</span></div>
+
+      <p class="visualizer-message" role="status">{{ status() }}</p>
+
+      <details class="keyboard-help" id="keyboard-help"><summary>How wall protection works &amp; keyboard controls</summary><p>Outline the wall to create a hard boundary, then click a bare wall area with Smart select. It follows similar connected pixels and stops at strong brightness or colour changes. Lower tolerance for tighter object protection; raise it gently to include shadows. Similar-coloured objects can still need Erase. This is edge-aware selection, not AI object recognition.</p><p>Erase keeps objects protected even after tolerance changes. Restore paint brings back erased areas only within the detected wall. Outline another wall and click its surface to include it. Undo restores up to 10 changes.</p><p>Keyboard: focus the photo and move with arrow keys (Shift for fine movement). In Outline, Space adds a corner and Enter sets the boundary. In Smart select, Enter or Space selects the wall at the crosshair. Backspace undoes; Escape cancels an outline.</p></details>
+
+    </div>
+
+    <aside class="room-reference" aria-label="Original room and quick controls">
+      <span class="eyebrow">BEFORE YOU BEGIN</span><h2>Your original room.</h2>
+      @if (originalPhotoUrl()) { <img class="original-room-preview" [src]="originalPhotoUrl()" alt="Original uploaded room before painting" /> }
+      <p>Your original photo stays unchanged.</p>
+      <div class="selected-paint"><span [style.background]="appearance.mode === 'pattern' ? appearance.pattern.base : color"></span><div><strong>{{ appearance.mode === 'pattern' ? (appearance.patternSource === 'upload' ? appearance.texture?.name : appearance.pattern.name) : selectedName }}</strong><small>{{ appearance.mode === 'pattern' && appearance.patternSource === 'upload' ? 'Your uploaded pattern' : appearance.mode === 'pattern' ? appearance.pattern.base + ' / ' + appearance.pattern.ink : color.toUpperCase() }}</small></div></div>
+
+      <nav class="studio-shortcuts" aria-label="Editor options">
+        <button type="button" (click)="openControls('colours',true)">Colours &amp; dual tone</button>
+        <button type="button" aria-label="Explore patterns &amp; upload your own ↗" (click)="openControls('patterns',true)">Patterns &amp; upload</button>
+        <button type="button" (click)="openControls('adjust',true)">Fine tune</button>
+        <button type="button" (click)="openControls('save',true)">Save &amp; download</button>
+      </nav>
+    </aside>
+    <section #controls class="paint-panel studio-controls" aria-label="Design options below preview">
+      <div class="studio-control-heading"><div><span class="eyebrow">MAKE IT YOURS</span><h2>A little change. A new feeling.</h2></div></div>
+      <nav class="studio-tabs" aria-label="Design controls">@for (tab of controlTabs; track tab.id) { <button type="button" [class.active]="controlTab===tab.id" [attr.aria-pressed]="controlTab===tab.id" (click)="openControls(tab.id)">{{ tab.label }}</button> }</nav>
+      <label for="paint-mode">Paint style</label><select id="paint-mode" [(ngModel)]="appearance.mode" (ngModelChange)="changeMode()"><option value="solid">Solid colour</option><option value="dual">Dual tone</option><option value="pattern">Pattern</option></select>
+
+      @if (controlTab === 'colours') {
+        <div class="colour-controls-grid"><div>      <label for="custom-paint">Try any colour</label><div class="custom-paint"><input id="custom-paint" type="color" [ngModel]="color" (ngModelChange)="chooseColor($event)" /><span>{{ color.toUpperCase() }}</span></div>
+
+      @if (appearance.mode === 'dual') {
+
+        <label for="second-colour">Second colour</label><input id="second-colour" type="color" [(ngModel)]="appearance.secondary" (ngModelChange)="render()" />
+
+        <label for="split-direction">Colour division</label><select id="split-direction" [(ngModel)]="appearance.direction" (ngModelChange)="render()"><option value="horizontal">Top / bottom</option><option value="vertical">Left / right</option></select>
+
+        <label for="paint-split">Split position · {{ appearance.split }}%</label><input id="paint-split" type="range" min="5" max="95" [(ngModel)]="appearance.split" (ngModelChange)="render()" />
+
+      }
+
+</div><div>      <label for="visualizer-search">Explore our shades</label><input id="visualizer-search" type="search" placeholder="Search name or hex…" [(ngModel)]="search" />
+
+      <label class="sr-only" for="visualizer-family">Colour family</label><select id="visualizer-family" [(ngModel)]="family">@for (item of families; track item) { <option [value]="item">{{ item }}</option> }</select>
+
+      <div class="visualizer-swatches">@for (shade of filteredShades; track shade.id) { <button type="button" [attr.aria-label]="shade.name" [attr.aria-pressed]="color.toLowerCase() === shade.hex" [class.selected]="color.toLowerCase() === shade.hex" [title]="shade.name" (click)="chooseColor(shade.hex)"><span [style.background]="shade.hex"></span><small>{{ shade.name }}</small></button> } @empty { <p class="control-hint">No shades found. Try another search.</p> }</div>
+
+</div></div>
+      }
+      @if (controlTab === 'patterns') {
+        <section class="wall-pattern-studio" aria-label="Wall patterns">
+          <h3>Dress up your wall.</h3><p>Choose a ready-made design or upload a wallpaper/pattern image.</p>
+          @if (!hasSelection()) {
+            <div class="pattern-selection-help" role="status"><strong>Select your wall to see the pattern.</strong><p>Outline the wall in your photo, then use Smart select or apply to the outlined area. Furniture inside your outline can be protected with Erase.</p>
+              @if (boundaryReady()) { <button type="button" class="action-button primary-action" (click)="useOutlinedWall()">Apply to my outlined wall</button> }
+              @else { <button type="button" class="action-button secondary-action" (click)="selectTool('outline'); preview.scrollIntoView({block:'center',behavior:'smooth'})">Outline my wall first</button> }
+            </div>
+          }
+          <input #patternInput class="file-input" type="file" accept="image/jpeg,image/png,image/webp" aria-label="Choose a pattern image" (change)="choosePatternFile($event)" />
+          <div class="pattern-upload-card"><strong>A pattern of your own?</strong><p>Upload JPG, PNG or WebP · Up to 5 MB. Use an image you own or have permission to use. It repeats across the selected wall.</p><button type="button" class="action-button primary-action" [disabled]="patternLoading()" (click)="patternInput.click()">{{ patternLoading() ? 'Opening pattern…' : 'Upload pattern image ↥' }}</button></div>
+          @if (patternError()) { <p role="alert" class="visualizer-error">{{ patternError() }}</p> }
+          @if (appearance.texture) {
+            <button type="button" class="uploaded-pattern-card" [class.chosen]="appearance.patternSource === 'upload'" (click)="appearance.patternSource='upload'; updatePaint()"><img [src]="texturePreview()" alt="Your uploaded pattern tile" /><span>{{ appearance.texture.name }}</span><small>{{ appearance.patternSource === 'upload' ? 'Applied to your selected wall' : 'Use this uploaded pattern' }}</small></button>
+          }
+          @if (appearance.patternSource === 'upload' && appearance.texture) {
+            <label for="texture-scale">Repeat size · {{ appearance.texture.scale }} px</label><input id="texture-scale" type="range" min="16" max="512" step="8" [(ngModel)]="appearance.texture.scale" (ngModelChange)="updatePaint()" />
+            <p class="control-hint">Smaller repeats more tiles. Your original room photo is kept unchanged.</p>
+          }
+          <label for="wall-pattern">Ready-made wall designs</label><select id="wall-pattern" [ngModel]="appearance.patternSource === 'upload' ? '' : appearance.pattern.id" (ngModelChange)="choosePattern($event)"><option value="" disabled>Choose a built-in pattern</option>@for (pattern of patterns; track pattern.id) { <option [value]="pattern.id">{{ pattern.name }}</option> }</select>
+          <div class="wall-pattern-grid">@for (pattern of patterns; track pattern.id) { <button type="button" [class.chosen]="appearance.patternSource !== 'upload' && appearance.pattern.id === pattern.id" [attr.aria-pressed]="appearance.patternSource !== 'upload' && appearance.pattern.id === pattern.id" (click)="choosePattern(pattern.id)"><span class="wall-pattern-tile" [style.background]="patternBackground(pattern)"></span><span>{{ pattern.name }}</span></button> }</div>
+          @if (appearance.patternSource !== 'upload') {
+            <label for="pattern-base">Background colour</label><input id="pattern-base" type="color" [(ngModel)]="appearance.pattern.base" (ngModelChange)="updatePaint()" />
+            <label for="pattern-ink">Motif colour</label><input id="pattern-ink" type="color" [(ngModel)]="appearance.pattern.ink" (ngModelChange)="updatePaint()" />
+            <label for="wall-pattern-scale">Pattern scale · {{ appearance.pattern.scale }} px</label><input id="wall-pattern-scale" type="range" min="16" max="96" step="4" [(ngModel)]="appearance.pattern.scale" (ngModelChange)="updatePaint()" />
+          }
+        </section>
+      }
+
+      @if (controlTab === 'adjust') { <div class="adjust-controls-grid"><div>      <div class="edge-protection"><label for="edge-tolerance">Edge tolerance · {{ edgeTolerance }}</label><input id="edge-tolerance" type="range" min="8" max="70" step="2" [(ngModel)]="edgeTolerance" (change)="updateTolerance()" [disabled]="!boundaryReady() || loading()" /><p>Lower = tighter edges. Higher = more wall shades and shadows. The outer boundary always stays locked.</p></div>
+
+</div><div>      <label for="paint-finish">Finish impression</label><select id="paint-finish" [(ngModel)]="appearance.finish" (ngModelChange)="render()"><option>Matte</option><option>Satin</option><option>Gloss</option></select><p class="control-hint">An illustrative finish. Real results vary with lighting, texture and the paint product.</p>
+
+      <label for="paint-strength">Paint strength · {{ strength }}%</label><input id="paint-strength" type="range" min="10" max="100" step="5" [(ngModel)]="strength" (ngModelChange)="render()" />
+
+      <p class="control-hint">Shadows and texture are carried through from your photo.</p>
+
+</div></div> }
+      @if (controlTab === 'save') {
+      <div class="save-design"><label for="design-name">Name this design</label><input id="design-name" type="text" maxlength="80" placeholder="e.g. Living room in sage" [(ngModel)]="designName" /><button type="button" class="action-button primary-action" [disabled]="!hasImage() || loading() || saving()" (click)="saveDesign()">{{ saving() ? 'Saving design…' : 'Save design + room photo' }}</button><p class="control-hint">{{ auth.user() ? 'Saves the original photo and editable design to your private account.' : 'Saves in this browser. Log in to import your designs into an account.' }} Each save creates a new version.</p>@if (saveMessage()) { <p class="visualizer-message" role="status">{{ saveMessage() }}</p> }@if (saveError()) { <p class="visualizer-error" role="alert">{{ saveError() }}</p> }</div>
+
+      <button type="button" class="action-button secondary-action download-button" [disabled]="!hasSelection() || loading()" (click)="download()">Download preview ↓</button>
+
+      <p class="control-hint">{{ hasSelection() ? 'Downloads your painted room without the selection outlines.' : 'Select a wall to enable the preview download.' }}</p>
+
+      }
+    </section>
+
+  </div>
+
+  <app-design-gallery (openDesign)="openSavedDesign($event)" />
+
+  <p class="visualizer-footnote">A little inspiration before the real thing. Screen colours, lighting, and paint finishes vary; test a physical paint sample before decorating. Previews are resized to a maximum of 1600 pixels for smooth editing. Saved designs also keep your original uploaded photo. Save a design to keep it after refreshing. Unsaved edits reset on refresh.</p>
+
+</section>
+

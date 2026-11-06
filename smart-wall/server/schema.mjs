@@ -1,0 +1,15 @@
+/** Database-level guards complement route validation and unique indexes. */
+export async function applySchemas(db) {
+  const schemas={
+    users:{required:['_id','email','password','role','createdAt'],properties:{_id:{bsonType:'string'},email:{bsonType:'string'},password:{bsonType:'string'},role:{enum:['user','admin']},disabled:{bsonType:'bool'},favourites:{bsonType:'array',items:{bsonType:'string'}}}},
+    projects:{required:['_id','id','userId','photoId','previewId','state'],properties:{_id:{bsonType:'string'},id:{bsonType:'string'},userId:{bsonType:'string'},photoId:{bsonType:'string'},previewId:{bsonType:'string'},state:{bsonType:'object'}}},
+    colours:{required:['_id','name','hex','family','brand','finishes'],properties:{hex:{bsonType:'string',pattern:'^#[0-9a-fA-F]{6}$'},finishes:{bsonType:'array',items:{enum:['Matte','Satin','Gloss']}}}},
+    patterns:{required:['_id','name','style','base','ink','scale'],properties:{name:{bsonType:'string'},base:{bsonType:'string',pattern:'^#[0-9a-fA-F]{6}$'},ink:{bsonType:'string',pattern:'^#[0-9a-fA-F]{6}$'}}},
+  };
+  const existing=new Set((await db.listCollections({}, {nameOnly:true}).toArray()).map(c=>c.name));
+  for(const [name,schema] of Object.entries(schemas)) {
+    const validator={$jsonSchema:{bsonType:'object',...schema}};
+    if(existing.has(name))await db.command({collMod:name,validator,validationLevel:'strict'});
+    else await db.createCollection(name,{validator});
+  }
+}
