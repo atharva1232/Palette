@@ -30,6 +30,27 @@ describe('Private account design storage', () => {
     await TestBed.inject(DesignStore).list();
     expect(local.list).toHaveBeenCalled(); expect(fetch).not.toHaveBeenCalled();
   });
+  it('saves and reopens editable masks and colours for additional walls', async () => {
+    let saved: Record<string, unknown> = {};
+    vi.stubGlobal('fetch', vi.fn(async (_url: string, options: RequestInit) => {
+      if (options.method === 'POST') saved = JSON.parse(options.body as string);
+      return response({ ...saved, photoType: 'image/png' });
+    }));
+    const wall = {
+      color: '#713343', strength: 90, tolerance: 32, seeds: [], polygons: [],
+      boundary: Uint8Array.of(0, 255), safety: Uint8Array.of(0, 255), protectedAreas: Uint8Array.of(0, 32),
+    };
+    const photo = new Blob(['test photo'], { type: 'image/png' });
+    const design: SavedDesign = {
+      ...wall, id: 'design', name: 'Two walls', savedAt: 1, fileName: 'room.png', photo, preview: photo,
+      walls: { active: 1, others: [{ ...wall, color: '#a3b9aa' }] },
+    };
+    const store = TestBed.inject(DesignStore);
+    await store.save(design);
+    const reopened = await store.get(design.id);
+    expect(reopened.walls).toEqual(design.walls);
+    expect(reopened.boundary).toEqual(design.boundary);
+  });
   it('rejects an old account response after the session changes', async () => {
     let finish!: (value: unknown) => void;
     vi.stubGlobal('fetch', vi.fn(() => new Promise(resolve => { finish = resolve; })));

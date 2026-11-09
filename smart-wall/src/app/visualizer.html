@@ -40,6 +40,19 @@
 
       <div class="editor-heading"><div><strong>{{ fileName() }}</strong><span>{{ imageWidth() }} × {{ imageHeight() }} preview</span></div><button type="button" class="action-button secondary-action" [disabled]="loading()" (click)="photoInput.click()">↥ Change room photo</button></div>
 
+      <div class="wall-picker" role="group" aria-label="Walls in this room">
+        <strong>Paint each wall</strong>
+        <div class="selection-tools">
+          @for (wall of wallLayers; track $index) {
+            <button type="button" [class.selected]="activeWall === $index" [attr.aria-pressed]="activeWall === $index" [disabled]="wallSwitchDisabled" (click)="switchWall($index)">
+              <span class="wall-picker-swatch" [style.backgroundColor]="wall?.design?.color ?? color" aria-hidden="true"></span> Wall {{ $index + 1 }}
+            </button>
+          }
+          <button type="button" [disabled]="!boundaryReady() || wallSwitchDisabled || wallLayers.length >= maxWalls" (click)="addWall()">＋ Add another wall</button>
+        </div>
+        <p>{{ wallLayers.length >= maxWalls ? 'Five walls in this design. Choose one to edit it.' : 'Set a boundary for each wall, then choose its colour. Select a wall above to edit it again.' }}</p>
+      </div>
+
       <div class="selection-tools" role="group" aria-label="Wall selection tools">
 
         <button type="button" [class.selected]="tool === 'outline'" [attr.aria-pressed]="tool === 'outline'" [disabled]="loading()" (click)="selectTool('outline')">◇ Outline boundary</button>
@@ -52,7 +65,7 @@
 
         <button type="button" [disabled]="(!canUndo() && !points.length) || loading()" (click)="undo()">↶ Undo</button>
 
-        <button type="button" [disabled]="(!boundaryReady() && !points.length) || loading()" (click)="clearSelection()">Reset walls</button>
+        <button type="button" [disabled]="(!boundaryReady() && !points.length) || loading()" (click)="clearSelection()">Reset current wall</button>
 
       </div>
 
@@ -66,7 +79,7 @@
 
       </div>
 
-      @if (boundaryReady()) { <div class="boundary-controls"><strong>✓ Wall boundary locked</strong><label><input type="checkbox" [(ngModel)]="showBoundary" (ngModelChange)="render()" /> Show boundary</label><span>All painting stays inside this outline.</span></div> }
+      @if (boundaryReady()) { <div class="boundary-controls"><strong>✓ Wall {{ activeWall + 1 }} boundary locked</strong><label><input type="checkbox" [(ngModel)]="showBoundary" (ngModelChange)="render()" /> Show boundary</label><span>Paint for this wall stays inside this outline.</span></div> }
 
       <div class="canvas-stage" [class.loading-photo]="loading()">
 
@@ -82,11 +95,11 @@
 
       }
 
-      <div class="editor-bottom"><button type="button" class="action-button secondary-action" [disabled]="!hasSelection() || loading()" [attr.aria-pressed]="original" (click)="compare()">{{ original ? 'Show painted room' : 'Compare with original ↔' }}</button><span>{{ hasSelection() ? 'Wall selected · object edges protected' : boundaryReady() ? 'Click the wall with Smart select to start painting.' : 'Outline a wall boundary to begin.' }}</span></div>
+      <div class="editor-bottom"><button type="button" class="action-button secondary-action" [disabled]="!hasPaintedWalls() || loading()" [attr.aria-pressed]="original" (click)="compare()">{{ original ? 'Show painted room' : 'Compare with original ↔' }}</button><span>{{ hasSelection() ? 'Wall selected · object edges protected' : boundaryReady() ? 'Click the wall with Smart select to start painting.' : 'Outline a wall boundary to begin.' }}</span></div>
 
       <p class="visualizer-message" role="status">{{ status() }}</p>
 
-      <details class="keyboard-help" id="keyboard-help"><summary>How wall protection works &amp; keyboard controls</summary><p>Outline the wall to create a hard boundary, then click a bare wall area with Smart select. It follows similar connected pixels and stops at strong brightness or colour changes. Lower tolerance for tighter object protection; raise it gently to include shadows. Similar-coloured objects can still need Erase. This is edge-aware selection, not AI object recognition.</p><p>Erase keeps objects protected even after tolerance changes. Restore paint brings back erased areas only within the detected wall. Outline another wall and click its surface to include it. Undo restores up to 10 changes.</p><p>Keyboard: focus the photo and move with arrow keys (Shift for fine movement). In Outline, Space adds a corner and Enter sets the boundary. In Smart select, Enter or Space selects the wall at the crosshair. Backspace undoes; Escape cancels an outline.</p></details>
+      <details class="keyboard-help" id="keyboard-help"><summary>How wall protection works &amp; keyboard controls</summary><p>Outline the wall to create a hard boundary, then click a bare wall area with Smart select. It follows similar connected pixels and stops at strong brightness or colour changes. Lower tolerance for tighter object protection; raise it gently to include shadows. Similar-coloured objects can still need Erase. This is edge-aware selection, not AI object recognition.</p><p>Erase keeps objects protected even after tolerance changes. Restore paint brings back erased areas only within the detected wall. Choose Add another wall for a separate colour. Undo restores up to 10 selection changes for the current wall.</p><p>Keyboard: focus the photo and move with arrow keys (Shift for fine movement). In Outline, Space adds a corner and Enter sets the boundary. In Smart select, Enter or Space selects the wall at the crosshair. Backspace undoes; Escape cancels an outline.</p></details>
 
     </div>
 
@@ -170,9 +183,9 @@
       @if (controlTab === 'save') {
       <div class="save-design"><label for="design-name">Name this design</label><input id="design-name" type="text" maxlength="80" placeholder="e.g. Living room in sage" [(ngModel)]="designName" /><button type="button" class="action-button primary-action" [disabled]="!hasImage() || loading() || saving()" (click)="saveDesign()">{{ saving() ? 'Saving design…' : 'Save design + room photo' }}</button><p class="control-hint">{{ auth.user() ? 'Saves the original photo and editable design to your private account.' : 'Saves in this browser. Log in to import your designs into an account.' }} Each save creates a new version.</p>@if (saveMessage()) { <p class="visualizer-message" role="status">{{ saveMessage() }}</p> }@if (saveError()) { <p class="visualizer-error" role="alert">{{ saveError() }}</p> }</div>
 
-      <button type="button" class="action-button secondary-action download-button" [disabled]="!hasSelection() || loading()" (click)="download()">Download preview ↓</button>
+      <button type="button" class="action-button secondary-action download-button" [disabled]="!hasPaintedWalls() || loading()" (click)="download()">Download preview ↓</button>
 
-      <p class="control-hint">{{ hasSelection() ? 'Downloads your painted room without the selection outlines.' : 'Select a wall to enable the preview download.' }}</p>
+      <p class="control-hint">{{ hasPaintedWalls() ? 'Downloads your painted room without the selection outlines.' : 'Select a wall to enable the preview download.' }}</p>
 
       }
     </section>

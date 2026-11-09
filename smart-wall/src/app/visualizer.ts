@@ -4,10 +4,10 @@ import { patternBackground, starterPatterns } from './catalog';
 import { Catalogue } from './catalogue';
 import { Activity } from './activity';
 import { PaintStyle, styledPaint, textureBytes } from './paint-style';
-import { Point, imagePoint, paintPixels, validatePhoto, selectWallRegion, constrainWallMask } from './paint-engine';
+import { Point, imagePoint, validatePhoto, selectWallRegion, constrainWallMask } from './paint-engine';
 import { Auth } from './auth';
 import { DesignGallery } from './design-gallery';
-import { DesignStore, SavedDesign } from './design-store';
+import { DesignStore, SavedDesign, WallDesign } from './design-store';
 
 type ControlTab = 'colours' | 'patterns' | 'adjust' | 'save';
 type Tool = 'outline' | 'smart' | 'brush' | 'erase';
@@ -18,6 +18,18 @@ interface SelectionState {
   seeds: Point[];
   polygons: Point[][];
   tolerance: number;
+}
+
+interface WallLayer {
+  design: WallDesign;
+  mask: Uint8Array | null;
+  history: SelectionState[];
+  points: Point[];
+  tool: Tool;
+}
+
+function defaultPaintStyle(): PaintStyle {
+  return { mode: 'solid', secondary: '#f0e8db', split: 50, direction: 'horizontal', finish: 'Matte', pattern: { ...starterPatterns[0] } };
 }
 
 @Component({
@@ -51,6 +63,7 @@ export class Visualizer implements OnDestroy {
         this.loadVersion++; this.textureVersion++; this.appearance.texture=undefined; this.appearance.patternSource='built-in'; this.texturePreview.set(''); this.patternError.set(''); this.patternLoading.set(false);
         this.clearOriginalUrl(); this.source = null; this.uploadedPhoto = null;
         this.boundary = null; this.safety = null; this.seeds = []; this.polygons = []; this.history = []; this.points = [];
+        this.wallLayers = [null]; this.activeWall = 0; this.hasPaintedWalls.set(false);
         this.painting = false; this.activePointer = null; this.canUndo.set(false); this.original = false;
         for (const canvas of [this.boundaryCanvas, this.protectionCanvas, this.outputCanvas]) { canvas.width = 1; canvas.height = 1; }
         this.hasImage.set(false); this.hasSelection.set(false); this.boundaryReady.set(false); this.wallDetected.set(false);
@@ -67,7 +80,7 @@ export class Visualizer implements OnDestroy {
   readonly catalogue = inject(Catalogue);
   private activity = inject(Activity);
   get shades() { return this.catalogue.colours(); }
-  appearance: PaintStyle = { mode: 'solid', secondary: '#f0e8db', split: 50, direction: 'horizontal', finish: 'Matte', pattern: { ...starterPatterns[0] } };
+  appearance = defaultPaintStyle();
   get patterns() { return [...this.catalogue.patterns(), ...this.catalogue.publishedPatterns()]; }
   readonly patternBackground = patternBackground;
   texturePreview = signal('');
@@ -120,6 +133,11 @@ export class Visualizer implements OnDestroy {
   error = signal('');
   status = signal('');
   hasSelection = signal(false);
+  hasPaintedWalls = signal(false);
+  readonly maxWalls = 5;
+  wallLayers: (WallLayer | null)[] = [null];
+  activeWall = 0;
+  get wallSwitchDisabled(): boolean { return this.loading() || this.patternLoading() || this.painting; }
   boundaryReady = signal(false);
   wallDetected = signal(false);
   canUndo = signal(false);
@@ -154,6 +172,65 @@ export class Visualizer implements OnDestroy {
   private activePointer: number | null = null;
   private frame = 0;
   private loadVersion = 0;
+
+  private captureWall(): WallDesign {
+    return {
+      color: this.color, strength: this.strength, appearance: this.appearance, tolerance: this.appliedTolerance,
+      boundary: this.boundary, safety: this.safety, protectedAreas: this.alpha(this.protectionCanvas),
+      seeds: this.seeds, polygons: this.polygons,
+    };
+  }
+
+  private wallMask(boundary: Uint8Array | null, safety: Uint8Array | null, protectedAreas: Uint8Array): Uint8Array | null {
+    if (!boundary || !safety) return null;
+    const mask = constrainWallMask(safety, boundary, protectedAreas);
+    return mask.some(value => value > 0) ? mask : null;
+  }
+
+  private restoreWall(design?: WallDesign): void {
+    this.color = design?.color ?? '#713343';
+    this.strength = design?.strength ?? 90;
+    this.appearance = design?.appearance ?? defaultPaintStyle();
+    if (this.controlTab === 'colours' || this.controlTab === 'patterns') {
+      this.controlTab = this.appearance.mode === 'pattern' ? 'patterns' : 'colours';
+    }
+    this.restoreTexturePreview();
+    this.boundary = design?.boundary ?? null;
+    this.safety = design?.safety ?? null;
+    this.seeds = design?.seeds ?? [];
+    this.polygons = design?.polygons ?? [];
+    this.edgeTolerance = this.appliedTolerance = design?.tolerance ?? 32;
+    this.restoreAlpha(this.boundaryCanvas, this.boundary);
+    this.restoreAlpha(this.protectionCanvas, design?.protectedAreas ?? null);
+    this.boundaryReady.set(!!this.boundary);
+    this.wallDetected.set(!!this.safety?.some(value => value > 0));
+  }
+
+  switchWall(index: number): void {
+    if (!this.source || this.wallSwitchDisabled || index === this.activeWall || index < 0 || index >= this.wallLayers.length) return;
+    const design = this.captureWall();
+    this.wallLayers[this.activeWall] = {
+      design, mask: this.wallMask(design.boundary, design.safety, design.protectedAreas),
+      history: this.history, points: this.points, tool: this.tool,
+    };
+    const next = this.wallLayers[index];
+    this.activeWall = index;
+    this.wallLayers[index] = null;
+    this.restoreWall(next?.design);
+    this.history = next?.history ?? [];
+    this.points = next?.points ?? [];
+    this.tool = next?.tool ?? 'outline';
+    this.keyboardPoint = null;
+    this.canUndo.set(this.history.length > 0);
+    this.status.set(next?.design.boundary ? `Editing Wall ${index + 1}.` : `Outline Wall ${index + 1}, then lock its boundary and click bare wall.`);
+    this.updatePaint();
+  }
+
+  addWall(): void {
+    if (!this.boundaryReady() || this.wallSwitchDisabled || this.wallLayers.length >= this.maxWalls) return;
+    this.wallLayers.push(null);
+    this.switchWall(this.wallLayers.length - 1);
+  }
 
   get selectedName(): string { return this.shades.find(shade => shade.hex.toLowerCase() === this.color.toLowerCase())?.name || 'Your custom colour'; }
   get filteredShades() {
@@ -211,6 +288,8 @@ export class Visualizer implements OnDestroy {
       if (!context) throw new Error();
       context.drawImage(bitmap, 0, 0, width, height);
       const source = context.getImageData(0, 0, width, height);
+      this.textureVersion++;
+      this.patternLoading.set(false);
       this.source = source;
       this.uploadedPhoto = file; this.clearOriginalUrl(); this.originalPhotoUrl.set(URL.createObjectURL(file));
       for (const canvas of [this.preview.nativeElement, this.boundaryCanvas, this.protectionCanvas, this.outputCanvas]) {
@@ -218,6 +297,9 @@ export class Visualizer implements OnDestroy {
         canvas.height = height;
       }
       this.history = [];
+      this.wallLayers = [null];
+      this.activeWall = 0;
+      this.hasPaintedWalls.set(false);
       this.boundary = null;
       this.safety = null;
       this.seeds = [];
@@ -423,11 +505,12 @@ export class Visualizer implements OnDestroy {
     this.tool = 'outline';
     this.points = [];
     this.original = false;
-    this.status.set('Walls reset. Outline a wall boundary to start again.');
+    this.status.set('Current wall reset. Outline its boundary to start again.');
     this.render();
   }
-  private restoreAlpha(canvas: HTMLCanvasElement, mask: Uint8Array): void {
+  private restoreAlpha(canvas: HTMLCanvasElement, mask: Uint8Array | null): void {
     const context = canvas.getContext('2d')!;
+    if (!mask) { context.clearRect(0, 0, canvas.width, canvas.height); return; }
     const image = context.createImageData(this.imageWidth(), this.imageHeight());
     for (let p = 0; p < mask.length; p++) { image.data[p * 4] = 255; image.data[p * 4 + 1] = 255; image.data[p * 4 + 2] = 255; image.data[p * 4 + 3] = mask[p]; }
     context.putImageData(image, 0, 0);
@@ -440,11 +523,19 @@ export class Visualizer implements OnDestroy {
   }
   render(): void {
     if (!this.source) return;
-    const empty = new Uint8Array(this.imageWidth() * this.imageHeight());
-    const mask = constrainWallMask(this.safety || empty, this.boundary || empty, this.alpha(this.protectionCanvas));
-    this.hasSelection.set(mask.some(value => value > 0));
+    const mask = this.safety && this.wallMask(this.boundary, this.safety, this.alpha(this.protectionCanvas));
+    this.hasSelection.set(!!mask);
+    this.hasPaintedWalls.set(!!mask || this.wallLayers.some(wall => !!wall?.mask));
     const output = this.outputCanvas.getContext('2d')!;
-    const painted = new ImageData(styledPaint(this.source.data, mask, this.imageWidth(), this.color, this.strength, this.appearance), this.imageWidth(), this.imageHeight());
+    const pixels = new Uint8ClampedArray(this.source.data);
+    for (const [index, wall] of this.wallLayers.entries()) {
+      const wallMask = index === this.activeWall ? mask : wall?.mask;
+      if (!wallMask) continue;
+      const design = wall?.design;
+      const appearance = design ? design.appearance ?? defaultPaintStyle() : this.appearance;
+      styledPaint(this.source.data, wallMask, this.imageWidth(), design?.color ?? this.color, design?.strength ?? this.strength, appearance, pixels);
+    }
+    const painted = new ImageData(pixels, this.imageWidth(), this.imageHeight());
     output.putImageData(painted, 0, 0);
     const context = this.preview.nativeElement.getContext('2d')!;
     context.putImageData(this.original ? this.source : painted, 0, 0);
@@ -502,7 +593,7 @@ export class Visualizer implements OnDestroy {
     this.render();
   }
   download(): void {
-    if (!this.source || !this.hasSelection()) return;
+    if (!this.source || !this.hasPaintedWalls()) return;
     this.render();
     this.outputCanvas.toBlob(blob => {
       if (!blob) { this.error.set('The preview could not be downloaded. Please try again.'); return; }
@@ -529,12 +620,12 @@ export class Visualizer implements OnDestroy {
       this.render();
       const photo = this.uploadedPhoto;
       const snapshot = {
+        ...structuredClone(this.captureWall()),
         id: crypto.randomUUID(), name: this.designName.trim().slice(0, 80) || this.fileName(),
-        appearance: structuredClone(this.appearance), savedAt: Date.now(), fileName: this.fileName(), color: this.appearance.mode === 'pattern' ? this.appearance.pattern.base : this.color, strength: this.strength,
-        tolerance: this.appliedTolerance, boundary: this.boundary?.slice() || null,
-        safety: this.safety?.slice() || null, protectedAreas: this.alpha(this.protectionCanvas),
-        seeds: this.seeds.map(point => ({ ...point })),
-        polygons: this.polygons.map(polygon => polygon.map(point => ({ ...point }))),
+        savedAt: Date.now(), fileName: this.fileName(), color: this.appearance.mode === 'pattern' ? this.appearance.pattern.base : this.color,
+        walls: this.wallLayers.length > 1 ? {
+          active: this.activeWall, others: structuredClone(this.wallLayers.flatMap(wall => wall ? [wall.design] : [])),
+        } : undefined,
       };
       const preview = await this.blob(this.outputCanvas);
       if (scope !== this.designStore.scope()) throw new Error('The account changed while saving. Please reopen the design and retry.');
@@ -550,20 +641,14 @@ export class Visualizer implements OnDestroy {
     await this.loadPhoto(new File([design.photo], design.fileName, { type: design.photo.type }));
     if (this.error() || !this.source || this.fileName() !== design.fileName) return;
     this.designName = design.name;
-    this.color = design.color;
-    this.strength = design.strength;
-    this.appearance = structuredClone(design.appearance || { mode: 'solid', secondary: '#f0e8db', split: 50, direction: 'horizontal', finish: 'Matte', pattern: starterPatterns[0] });
-    this.controlTab=this.appearance.mode==='pattern'?'patterns':'colours';
-    this.restoreTexturePreview();
-    this.boundary = design.boundary?.slice() || null;
-    this.safety = design.safety?.slice() || null;
-    this.seeds = design.seeds.map(point => ({ ...point }));
-    this.polygons = design.polygons.map(polygon => polygon.map(point => ({ ...point })));
-    this.edgeTolerance = this.appliedTolerance = design.tolerance;
-    this.restoreAlpha(this.boundaryCanvas, this.boundary || new Uint8Array(this.imageWidth() * this.imageHeight()));
-    this.restoreAlpha(this.protectionCanvas, design.protectedAreas);
-    this.boundaryReady.set(!!this.boundary);
-    this.wallDetected.set(!!this.safety?.some(value => value > 0));
+    this.activeWall = design.walls?.active ?? 0;
+    this.wallLayers = structuredClone(design.walls?.others ?? []).map(wall => ({
+      design: wall, mask: this.wallMask(wall.boundary, wall.safety, wall.protectedAreas),
+      history: [], points: [], tool: wall.boundary ? 'smart' : 'outline',
+    }));
+    this.wallLayers.splice(this.activeWall, 0, null);
+    this.controlTab = 'colours';
+    this.restoreWall(structuredClone(design));
     this.tool = this.boundary ? 'smart' : 'outline';
     this.status.set('Saved design reopened with its original photo and wall selection. Save again to keep a new version.');
     this.render();

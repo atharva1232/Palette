@@ -33,8 +33,8 @@ export function motif(style: string, x: number, y: number, scale: number): boole
     default: return false;
   }
 }
-export function styledPaint(source: Uint8ClampedArray, mask: Uint8Array, width: number, colour: string, strength: number, style: PaintStyle): Uint8ClampedArray<ArrayBuffer> {
-  const output = new Uint8ClampedArray(source), height = mask.length / width;
+export function styledPaint(source: Uint8ClampedArray, mask: Uint8Array, width: number, colour: string, strength: number, style: PaintStyle, output = new Uint8ClampedArray(source)): Uint8ClampedArray<ArrayBuffer> {
+  const height = mask.length / width;
   const rgb = (hex: string) => [1,3,5].map(i => parseInt(hex.slice(i,i+2),16));
   const main = rgb(style.mode === 'pattern' ? style.pattern.base : colour);
   const accent = rgb(style.mode === 'pattern' ? style.pattern.ink : style.secondary);
@@ -62,7 +62,7 @@ export function styledPaint(source: Uint8ClampedArray, mask: Uint8Array, width: 
     // Finish is an illustrative response to highlights, not a physical lighting simulation.
     const sheen=style.finish === 'Gloss' ? .15 : style.finish === 'Satin' ? .06 : 0;
     const alpha=mask[p]/255*strength/100*tileAlpha;
-    for (let c=0;c<3;c++) { const paint=Math.min(255,Math.max(0,target[c]*light+Math.max(0,light-1)*255*sheen)); output[i+c]=source[i+c]*(1-alpha)+paint*alpha; }
+    for (let c=0;c<3;c++) { const paint=Math.min(255,Math.max(0,target[c]*light+Math.max(0,light-1)*255*sheen)); output[i+c]=output[i+c]*(1-alpha)+paint*alpha; }
   }
   return output;
 }

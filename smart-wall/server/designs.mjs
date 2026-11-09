@@ -1,4 +1,5 @@
 import { validatePattern } from './patterns.mjs';
+import { inflateSync } from 'node:zlib';
 const hex = /^#[0-9a-f]{6}$/i;
 const fail = message => { throw Object.assign(new Error(message), { status: 400 }); };
 export function decode(value, max) {
@@ -9,8 +10,8 @@ export function decode(value, max) {
 }
 export function validateDesign(value) {
   if (!value || typeof value !== 'object') fail('Invalid design.');
-  const { name, fileName, color, strength, tolerance } = value;
-  if (typeof name !== 'string' || !name.trim() || name.length > 80 || typeof fileName !== 'string' || fileName.length > 255 || !hex.test(color) || !Number.isFinite(strength) || strength < 10 || strength > 100 || !Number.isFinite(tolerance) || tolerance < 8 || tolerance > 70) fail('Invalid design settings.');
+  const { name, fileName } = value;
+  if (typeof name !== 'string' || !name.trim() || name.length > 80 || typeof fileName !== 'string' || fileName.length > 255) fail('Invalid design settings.');
   const photo = decode(value.photo, 15 * 1024 * 1024);
   const preview = decode(value.preview, 12 * 1024 * 1024);
   const png = Buffer.from('89504e470d0a1a0a', 'hex');
@@ -18,10 +19,32 @@ export function validateDesign(value) {
   if (!type || preview.length < 24 || !preview.subarray(0, 8).equals(png) || preview.toString('ascii', 12, 16) !== 'IHDR') fail('Use a JPG, PNG, or WebP room photo and a PNG preview.');
   const width = preview.readUInt32BE(16), height = preview.readUInt32BE(20);
   if (!width || !height || width > 1600 || height > 1600) fail('Invalid preview dimensions.');
+  const { color: activeColour, ...wall } = validateWall(value, width, height, false);
+  let walls;
+  if (value.walls !== undefined) {
+    const { active, others } = value.walls || {};
+    if (!Array.isArray(others) || others.length < 1 || others.length > 4 || !Number.isInteger(active) || active < 0 || active > others.length) fail('Invalid wall layers.');
+    walls = { active, others: others.map(other => validateWall(other, width, height, true)) };
+  }
+  const state = JSON.stringify({ ...wall, walls });
+  const stateBytes = Buffer.byteLength(state);
+  if (walls && stateBytes > 14 * 1024 * 1024) fail('This design has too much wall detail to save. Try simplifying a wall selection.');
+  return { name: name.trim(), fileName, color: activeColour, photo, preview, type, state, bytes: photo.length + preview.length + stateBytes };
+}
+
+function validateWall(value, width, height, compressed) {
+  if (!value || typeof value !== 'object') fail('Invalid wall layer.');
+  const { color, strength, tolerance } = value;
+  if (typeof color !== 'string' || !hex.test(color) || !Number.isFinite(strength) || strength < 10 || strength > 100 || !Number.isFinite(tolerance) || tolerance < 8 || tolerance > 70) fail('Invalid design settings.');
   const size = width * height;
   for (const field of ['boundary', 'safety', 'protectedAreas']) {
     if (field !== 'protectedAreas' && value[field] === null) continue;
-    if (decode(value[field], size).length !== size) fail('Selection does not match this photo.');
+    let mask = decode(value[field], compressed ? size + 65536 : size);
+    if (compressed) {
+      try { mask = inflateSync(mask, { maxOutputLength: size }); }
+      catch { fail('Invalid compressed wall selection.'); }
+    }
+    if (mask.length !== size) fail('Selection does not match this photo.');
   }
   if (value.safety !== null && value.boundary === null) fail('A selected wall needs a boundary.');
   const point = p => p && Number.isFinite(p.x) && Number.isFinite(p.y) && p.x >= 0 && p.y >= 0 && p.x < width && p.y < height;
@@ -42,7 +65,6 @@ export function validateDesign(value) {
     }
     if (appearance.patternSource === 'upload' && !appearance.texture) fail('Upload a pattern image first.');
   }
-  const state = JSON.stringify({ appearance, strength, tolerance, boundary: value.boundary, safety: value.safety, protectedAreas: value.protectedAreas, seeds: value.seeds, polygons: value.polygons });
-  return { name: name.trim(), fileName, color, photo, preview, type, state, bytes: photo.length + preview.length + Buffer.byteLength(state) };
+  return { color, appearance, strength, tolerance, boundary: value.boundary, safety: value.safety, protectedAreas: value.protectedAreas, seeds: value.seeds, polygons: value.polygons };
 }
 export const designSummary = row => ({ id: row.id, name: row.name, savedAt: row.saved_at, fileName: row.file_name, color: row.color, photoUrl: `/api/designs/${row.id}/photo`, previewUrl: `/api/designs/${row.id}/preview` });

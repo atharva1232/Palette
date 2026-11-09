@@ -4,6 +4,7 @@ import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
+import { deflateSync } from 'node:zlib';
 import { connectMongo, migrateSqlite } from './mongo.mjs';
 import { createMeanApi } from './mean-api.mjs';
 import { backupMongo, restoreMongo, verifyBackup } from './mongo-backup.mjs';
@@ -20,6 +21,11 @@ test('MEAN integration: real MongoDB, JWT, roles, photos, catalogues, analytics 
   const close=async()=>{await new Promise(r=>server.close(r));await server.resourcesClosed;};
   const call=(path,method='GET',body,cookie='',headers={})=>fetch(base+path,{method,headers:{'Content-Type':'application/json','X-SmartWall-Request':'1',Cookie:cookie,...headers},...(body===undefined?{}:{body:JSON.stringify(body)})});
   let alice,bob,ac,bc; const design=room(); design.appearance.patternSource='upload'; design.appearance.texture={name:'custom.png',width:1,height:1,scale:160,pixels:Buffer.from([255,0,0,255]).toString('base64')}; let pid;
+  const compress = value => deflateSync(Buffer.from(value, 'base64')).toString('base64');
+  design.walls = { active: 1, others: [{
+    color: '#8eafa0', strength: 75, tolerance: 30, seeds: [], polygons: [],
+    boundary: compress('/w=='), safety: compress('/w=='), protectedAreas: compress('AA=='),
+  }] };
   try {
     await start();
     await t.test('rejects anonymous admin, forged signup roles and cross-origin writes',async()=>{
@@ -44,6 +50,9 @@ test('MEAN integration: real MongoDB, JWT, roles, photos, catalogues, analytics 
       assert.equal((await call('/api/designs','POST',design,ac)).status,201);assert.equal((await call('/api/designs','POST',design,ac)).status,200);
       assert.equal(await store.db.collection('projects').countDocuments({userId:alice.id}),1);
       const result=await (await call('/api/designs/'+design.id,'GET',undefined,ac)).json();assert.equal(result.photo,png);assert.equal(result.appearance.mode,'pattern');assert.equal(result.appearance.finish,'Satin');assert.deepEqual(result.appearance.texture,design.appearance.texture);assert.equal(result.appearance.patternSource,'upload');
+      assert.deepEqual(result.walls, design.walls);
+      const corruptWall = { ...design.walls.others[0], safety: '/w==' };
+      assert.equal((await call('/api/designs', 'POST', { ...room(), walls: { active: 1, others: [corruptWall] } }, ac)).status, 400);
       assert.equal((await call('/api/designs/'+design.id+'/photo','GET',undefined,bc)).status,404);
       assert.equal((await call('/api/designs/'+design.id+'/preview')).status,401);
       assert.equal((await call('/api/designs','POST',{...room(),appearance:{mode:'invalid'}},ac)).status,400);
