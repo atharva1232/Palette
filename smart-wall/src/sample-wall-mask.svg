@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1067" viewBox="0 0 1600 1067">
+  <mask id="wall" maskUnits="userSpaceOnUse" x="0" y="0" width="1600" height="1067">
+    <!-- Follow the ceiling, wall corner, floor, and foreground upholstery. -->
+    <path fill="white" d="M683 185 1600 5V884
+      C1520 863 1424 834 1361 823Q1339 818 1329 834L1324 873 1305 869
+      Q1314 853 1315 827L1313 706Q1313 699 1306 699L1278 696
+      Q1277 672 1251 667L1051 643Q1043 641 1038 648L904 626Q892 623 888 634L880 679
+      806 696Q794 699 794 711L796 728 684 692Z" />
+    <!-- Picture frame, chair back, lamp heads and stems, and side-table hardware. -->
+    <path d="M961 490 1168 473 1174 574 965 573Z
+      M722 609 761 613 753 686Q752 691 744 694L718 700 713 690Z
+      M659 413H684V427H660Z M704 414 722 405 730 416 709 425Z
+      M722 419 743 413 748 425 726 431Z" />
+    <path fill="none" stroke="black" stroke-linecap="round" stroke-width="6" d="M678 635 676 558Q674 475 672 425
+      M676 557Q677 465 713 420M676 554Q685 467 733 425
+      M677 556Q670 467 639 427M677 556Q661 470 607 429
+      M1534 792 1575 793 1580 876M1542 795 1545 868" />
+    <path fill="none" stroke="black" stroke-width="3" d="M1348 826C1376 789 1473 810 1538 838Q1597 856 1598 872" />
+  </mask>
+  <rect width="1600" height="1067" fill="white" mask="url(#wall)" />
+</svg>

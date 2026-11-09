@@ -77,10 +77,14 @@ describe('SmartWall', () => {
     input.dispatchEvent(new Event('input', { bubbles: true }));
     await fixture.whenStable();
     expect(element.querySelectorAll('.shade-card').length).toBe(1);
+    element.querySelector<HTMLButtonElement>('.compare-button')!.click();
+    await fixture.whenStable();
+    expect(element.querySelector('.wall-overlay')!.classList.contains('original')).toBe(true);
     element.querySelector<HTMLButtonElement>('.shade-card')!.click();
     await fixture.whenStable();
     expect(element.querySelector('.studio-preview h2')!.textContent).toBe('Midnight');
     expect(element.querySelector<HTMLElement>('.wall-paint')!.style.backgroundColor).toBe('rgb(52, 75, 103)');
+    expect(element.querySelector('.wall-overlay')!.classList.contains('original')).toBe(false);
     input.value = 'no-match';
     input.dispatchEvent(new Event('input', { bubbles: true }));
     await fixture.whenStable();
@@ -136,6 +140,9 @@ describe('SmartWall', () => {
     await fixture.whenStable();
     expect(element.querySelector('.wall-overlay')!.classList.contains('original')).toBe(true);
     expect(element.querySelector('.compare-button')!.getAttribute('aria-pressed')).toBe('true');
+    swatch.click();
+    await fixture.whenStable();
+    expect(element.querySelector('.wall-overlay')!.classList.contains('original')).toBe(false);
   });
   it('validates signup, creates a real session and logs out through the API', async () => {
     const fixture = TestBed.createComponent(App);

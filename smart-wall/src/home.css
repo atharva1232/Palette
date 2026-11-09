@@ -1,8 +1,15 @@
 /* Photograph and a hand-masked accent wall preserve the room's furniture. */
 .photo-room .room-photo { display: block; width: 100%; height: auto; aspect-ratio: 1600 / 1067; }
-.wall-overlay { position: absolute; inset: 0; width: 100%; height: 100%; mix-blend-mode: multiply; pointer-events: none; transition: opacity 180ms; }
+.wall-overlay, .wall-paint, .wall-pattern-layer, .wall-lighting { position: absolute; inset: 0; width: 100%; height: 100%; }
+.wall-overlay {
+  isolation: isolate;
+  mask: url('./sample-wall-mask.svg') center / 100% 100% no-repeat;
+  pointer-events: none;
+  transition: opacity 180ms;
+}
 .wall-overlay.original { opacity: 0; }
-.wall-paint { width: 1600px; height: 1067px; }
+.wall-pattern-paint { width: 1600px; height: 1067px; }
+.wall-lighting { filter: grayscale(1) brightness(1.24); mix-blend-mode: multiply; }
 .compare-button { position: absolute; right: 12px; bottom: 12px; padding: 7px 10px; border: 1px solid #ffffff66; border-radius: 6px; background: #321720dc; color: #fff6ef; font: inherit; font-size: 10px; }
 .decorative-ribbon { display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 20px; padding: 23px 28px; border-top: 1px solid var(--border); border-bottom: 1px solid #ddc9cc; color: #713343; background: #f4e8e3; font-size: 10px; letter-spacing: 2px; }
 .decorative-ribbon i { font-style: normal; font-size: 28px; }
@@ -30,7 +37,7 @@
 .feature-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 4px 15px; color: #713343; font-size: 8px; letter-spacing: 1.5px; }
 .feature-toolbar > span:first-child { display: flex; gap: 4px; }.feature-toolbar i { width: 6px; height: 6px; background: #d6b4bc; border-radius: 50%; }
 .feature-photo { position: relative; isolation: isolate; overflow: hidden; border-radius: 6px; }
-.feature-photo > img { display: block; width: 100%; height: auto; }.feature-paint { width: 1600px; height: 1067px; }
+.feature-photo > img { display: block; width: 100%; height: auto; }
 .feature-photo-label { position: absolute; top: 12px; background: #fffaf5ed; color: #713343; border-radius: 4px; padding: 7px 9px; font-size: 8px; letter-spacing: 1px; }.before-label { left: 10px; }.after-label { right: 10px; }
 .feature-divider { position: absolute; top: 0; bottom: 0; width: 2px; background: #fffaf5; transform: translateX(-50%); pointer-events: none; box-shadow: 0 0 6px #32172044; }.feature-divider > span { position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%); display: grid; place-items: center; border-radius: 50%; width: 32px; height: 32px; background: #fffaf5; color: #713343; font-size: 19px; }
 .feature-comparison { display: flex; align-items: center; gap: 18px; padding: 17px 4px 5px; }.feature-comparison label { flex: 1; color: #806b72; font-size: 10px; }.feature-comparison input { width: 36%; accent-color: #713343; cursor: ew-resize; }

@@ -26,18 +26,22 @@
   @if (auth.error() && page !== 'login' && page !== 'signup') { <p class="account-error" role="alert">{{ auth.error() }}</p> }
   <!-- After its first visit, keep the editor mounted to preserve the photo and selection. -->
   @if (visualizerOpened) { <app-visualizer [hidden]="page !== 'visualize'" /> }
-  <ng-template #roomPreview let-background="background">
+  <ng-template #sampleWallPaint let-background="background" let-original="original" let-pattern="pattern" let-clip="clip">
+    <div class="wall-overlay" [class.original]="original" [style.clip-path]="clip" aria-hidden="true">
+      @if (pattern) {
+        <svg class="wall-pattern-layer" viewBox="0 0 1600 1067">
+          <foreignObject width="1600" height="1067"><div xmlns="http://www.w3.org/1999/xhtml" class="wall-pattern-paint" [style.background]="background"></div></foreignObject>
+        </svg>
+      } @else {
+        <div class="wall-paint" [style.backgroundColor]="background"></div>
+      }
+      <img class="wall-lighting" src="images/lounge.jpg" width="1600" height="1067" alt="" loading="lazy" />
+    </div>
+  </ng-template>
+  <ng-template #roomPreview let-background="background" let-pattern="pattern">
     <div class="room photo-room">
       <img class="room-photo" src="images/lounge.jpg" width="1600" height="1067" alt="Bright furnished living room with a grey sofa, glass coffee table and an accent wall" fetchpriority="high" />
-      <svg class="wall-overlay" [class.original]="showOriginal" viewBox="0 0 1600 1067" aria-hidden="true">
-        <defs><mask id="accent-wall-mask">
-          <path fill="white" d="M684 184 1600 5V795L1530 795 1530 815 1320 860 1310 770 1285 704 1276 660 1250 646 890 626 861 636 852 686 797 705 797 738 684 699Z" />
-          <path fill="black" d="M960 490 1168 474 1176 577 962 572Z" />
-          <path fill="black" d="M722 610 760 612 751 668 760 677 757 712 730 715 726 754 719 754 723 710 718 707Z" />
-          <path fill="none" stroke="black" stroke-width="15" d="M680 646V433M680 435 739 414M680 435 630 414M680 435 595 428" />
-        </mask></defs>
-        <foreignObject width="1600" height="1067" mask="url(#accent-wall-mask)"><div xmlns="http://www.w3.org/1999/xhtml" class="wall-paint" [style.background]="background"></div></foreignObject>
-      </svg>
+      <ng-container *ngTemplateOutlet="sampleWallPaint; context: { background, original: showOriginal, pattern }" />
       <span class="room-label">{{ showOriginal ? 'The original room' : 'Your accent wall, reimagined' }}</span>
       <button class="compare-button" type="button" [attr.aria-pressed]="showOriginal" (click)="showOriginal = !showOriginal">{{ showOriginal ? 'See your design ◈' : 'View original ↔' }}</button>
     </div>
@@ -61,7 +65,7 @@
           <h2>Find your favourite shade</h2><p>Click a colour to preview it.</p>
           <div class="swatches">
             @for (color of colors; track color.hex) {
-              <button class="swatch" type="button" [style.backgroundColor]="color.hex" [class.selected]="selectedColor === color.hex" [attr.aria-label]="color.name" [attr.aria-pressed]="selectedColor === color.hex" [title]="color.name" (click)="selectedColor = color.hex"></button>
+              <button class="swatch" type="button" [style.backgroundColor]="color.hex" [class.selected]="selectedColor === color.hex" [attr.aria-label]="color.name" [attr.aria-pressed]="selectedColor === color.hex" [title]="color.name" (click)="previewShade(color.hex)"></button>
             }
           </div>
         </div>
@@ -84,15 +88,7 @@
           <div class="feature-toolbar"><span><i></i><i></i><i></i></span><span>SMARTWALL / COLOUR STUDIO</span><span aria-hidden="true">↗</span></div>
           <div class="feature-photo">
             <img src="images/lounge.jpg" width="1600" height="1067" loading="lazy" alt="Compare the original living room with a new colour on its accent wall" />
-            <svg class="wall-overlay feature-overlay" [style.clip-path]="'inset(0 0 0 ' + featureReveal + '%)'" viewBox="0 0 1600 1067" aria-hidden="true">
-              <defs><mask id="feature-wall-mask">
-                <path fill="white" d="M684 184 1600 5V795L1530 795 1530 815 1320 860 1310 770 1285 704 1276 660 1250 646 890 626 861 636 852 686 797 705 797 738 684 699Z" />
-                <path fill="black" d="M960 490 1168 474 1176 577 962 572Z" />
-                <path fill="black" d="M722 610 760 612 751 668 760 677 757 712 730 715 726 754 719 754 723 710 718 707Z" />
-                <path fill="none" stroke="black" stroke-width="15" d="M680 646V433M680 435 739 414M680 435 630 414M680 435 595 428" />
-              </mask></defs>
-              <foreignObject width="1600" height="1067" mask="url(#feature-wall-mask)"><div xmlns="http://www.w3.org/1999/xhtml" class="feature-paint" [style.background]="featureColor"></div></foreignObject>
-            </svg>
+            <ng-container *ngTemplateOutlet="sampleWallPaint; context: { background: featureColor, clip: 'inset(0 0 0 ' + featureReveal + '%)' }" />
             <span class="feature-photo-label before-label">BEFORE</span><span class="feature-photo-label after-label">YOUR NEW LOOK</span>
             <span class="feature-divider" [style.left.%]="featureReveal" aria-hidden="true"><span>↔</span></span>
           </div>
@@ -140,7 +136,7 @@
           <p class="results" aria-live="polite">{{ filteredShades.length }} shades to explore</p>
           <div class="shade-grid">
             @for (shade of filteredShades; track shade.id) {
-              <button type="button" class="shade-card" [class.chosen]="selectedShade.id === shade.id" [attr.aria-pressed]="selectedShade.id === shade.id" (click)="selectedColor = shade.hex; selectedShadeId = shade.id">
+              <button type="button" class="shade-card" [class.chosen]="selectedShade.id === shade.id" [attr.aria-pressed]="selectedShade.id === shade.id" (click)="previewShade(shade.hex, shade.id)">
                 <span class="shade-paint" [style.background]="shade.hex"><span class="selection-mark" [class.visible]="selectedColor === shade.hex">✓</span></span>
                 <span class="shade-name">{{ shade.name }}</span><span class="shade-code">{{ shade.hex.toUpperCase() }}</span>
               </button>
@@ -192,7 +188,7 @@
         </div>
         <aside class="preview-card studio-preview">
           <div class="preview-heading"><span class="eyebrow">LIVE ROOM PREVIEW</span><span>02 / PATTERN</span></div>
-          <ng-container *ngTemplateOutlet="roomPreview; context: { background: patternBackground(showPatternBuilder ? draft : selectedPattern) }" />
+          <ng-container *ngTemplateOutlet="roomPreview; context: { background: patternBackground(showPatternBuilder ? draft : selectedPattern), pattern: true }" />
           <div class="palette" aria-live="polite"><span class="eyebrow">{{ showPatternBuilder ? 'YOUR DESIGN IN PROGRESS' : 'YOUR SELECTED PATTERN' }}</span><h2>{{ showPatternBuilder ? (draft.name || 'An original, by you.') : selectedPattern.name }}</h2>@if (auth.user() && !showPatternBuilder) { <button type="button" class="text-button" (click)="catalogue.toggle('pattern', selectedPattern.id)">{{ catalogue.favourites().includes('pattern:' + selectedPattern.id) ? 'Remove favourite' : 'Save favourite pattern' }}</button> }<p>{{ showPatternBuilder ? draft.style : selectedPattern.style }} · {{ showPatternBuilder ? draft.scale : selectedPattern.scale }} px repeat</p>@if (!showPatternBuilder) { <button class="button secondary full" type="button" (click)="editPattern()">Customise this pattern →</button><button type="button" class="button primary full" (click)="tryPatternOnPhoto()">Try on my photo →</button>@if (auth.user() && selectedPattern.ownerId === auth.user()?.id) { <button class="text-button" type="button" (click)="patternToDelete = selectedPattern.id">Delete my pattern</button>@if (patternToDelete === selectedPattern.id) { <p>Delete this shared pattern? This cannot be undone.</p><button class="button secondary" type="button" (click)="deletePattern(selectedPattern.id)">Confirm deletion</button><button class="text-button" type="button" (click)="patternToDelete = ''">Cancel</button> } } }</div>
         </aside>
       </div>

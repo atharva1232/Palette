@@ -57,6 +57,12 @@ export class App {
   selectedColor = '#713343';
   selectedShadeId = '';
   showOriginal = false;
+  previewShade(colour: string, shadeId = ''): void {
+    this.selectedColor = colour;
+    this.selectedShadeId = shadeId;
+    this.showOriginal = false;
+  }
+
   featureColor = '#713343';
   featureReveal = 48;
   readonly featureShades = shades.filter(shade => ['Velvet Maroon', 'Sage Green', 'Warm Beige'].includes(shade.name));
