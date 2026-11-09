@@ -68,9 +68,9 @@ export class App {
   readonly featureShades = shades.filter(shade => ['Velvet Maroon', 'Sage Green', 'Warm Beige'].includes(shade.name));
   readonly featuredPatterns = starterPatterns.slice(6, 10);
   readonly moods = [
-    { name: 'The warm embrace', note: 'Earthy, sunlit, effortlessly welcoming.', family: 'Earth tones', shade: '#b9674d', colours: ['#b9674d', '#d6bea0', '#f0e8db'], image: 'images/lounge.jpg', position: '75% 65%', number: '01' },
-    { name: 'A softer kind of bold', note: 'Romantic rose meets a little maroon drama.', family: 'Reds & pinks', shade: '#713343', colours: ['#713343', '#c58e96', '#ebcbd0'], image: 'images/living-room.jpg', position: '50% 70%', number: '02' },
-    { name: 'A breath of fresh air', note: 'Quiet greens for your everyday retreat.', family: 'Greens', shade: '#b8c9ae', colours: ['#36584c', '#b8c9ae', '#f0e8db'], image: 'images/lounge.jpg', position: '95% 60%', number: '03' },
+    { name: 'The warm embrace', note: 'Earthy, sunlit, effortlessly welcoming.', family: 'Earth tones', shade: '#b9674d', colours: ['#b9674d', '#d6bea0', '#f0e8db'], image: 'images/lounge.jpg', alt: 'Furnished lounge with a grey sofa and a glass coffee table', position: '75% 65%', label: '01 / The Mood Changer', tinted: true },
+    { name: 'A softer kind of bold', note: 'Romantic rose meets a little maroon drama.', family: 'Reds & pinks', shade: '#713343', colours: ['#713343', '#c58e96', '#ebcbd0'], image: 'images/classic-patterned-living-room.jpg', alt: 'Cream sofas in a living room with a geometric striped accent wall', position: '50% 50%', label: '02 / Classic', tinted: true },
+    { name: 'A calmer shade of blue', note: 'Slate blue panelling, soft linens, and warm wood.', family: 'Blues', shade: '#72869c', colours: ['#344b67', '#72869c', '#ede6dc'], image: 'images/sky-effect-bedroom.jpg', alt: 'Bedroom with a blue panelled accent wall, cream bedding and tall windows', position: '32% 50%', label: '03 / Sky Effect', tinted: false },
   ];
   openMood(mood: typeof this.moods[number]): void {
     this.family = mood.family;

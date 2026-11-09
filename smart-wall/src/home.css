@@ -15,7 +15,7 @@
 .decorative-ribbon i { font-style: normal; font-size: 28px; }
 .editorial-section { max-width: 1340px; padding: 90px 36px; margin: auto; }
 .editorial-heading { display: flex; justify-content: space-between; align-items: end; gap: 36px; margin-bottom: 38px; }
-.editorial-heading h2, .feature-copy h2, .faq-section h2, .closing-note h2 { margin: 18px 0 0; font-family: Georgia, serif; font-size: clamp(34px, 3.5vw, 48px); font-weight: 400; line-height: 1.15; letter-spacing: -1.2px; }
+.editorial-heading h2, .feature-copy h2, .faq-section h2 { margin: 18px 0 0; font-family: Georgia, serif; font-size: clamp(34px, 3.5vw, 48px); font-weight: 400; line-height: 1.15; letter-spacing: -1.2px; }
 .editorial-heading em, .feature-copy em, .faq-section em { color: #a26376; font-weight: 400; }
 .editorial-heading > p { max-width: 340px; color: var(--muted); font-size: 13px; line-height: 1.9; margin: 0; }
 .mood-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
@@ -54,19 +54,15 @@
 .featured-pattern > span:last-child { display: block; font-size: 10px; color: var(--muted); margin-top: 8px; line-height: 1.7; }
 .process-section { padding-top: 26px; }
 .process-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 44px; }
-.process-grid article { padding: 28px 0 0; border-top: 1px solid var(--border); position: relative; }
+.process-grid article { padding: 28px 24px; background: #f3e8e1; border: 1px solid var(--border); border-radius: 16px; position: relative; }
 .process-grid article > span { font-size: 10px; color: var(--sage); letter-spacing: 2px; }
 .process-icon { font-size: 56px; color: var(--sage); line-height: 1; margin: 28px 0; }
 .process-grid h3 { font-family: Georgia, serif; font-size: 26px; font-weight: 400; margin: 20px 0; }
-.process-grid p { color: var(--muted); font-size: 13px; line-height: 1.9; }
-.faq-section { display: grid; grid-template-columns: 1fr 1.4fr; gap: 80px; max-width: 1268px; margin: 0 auto 90px; padding: 55px; background: #f3e8e1; border-radius: 16px; }
+.process-grid p, .faq-list details p { color: #6b5059; font-size: 13px; line-height: 1.9; }
+.faq-section { display: grid; grid-template-columns: 1fr 1.4fr; gap: 80px; max-width: 1268px; margin: 0 auto 90px; padding: 55px; background: #e8d1d7; border-radius: 16px; }
 .faq-flower { display: block; font-size: 100px; color: var(--maroon); line-height: 1; margin-top: 30px; }
 .faq-list details { padding: 20px 0; border-bottom: 1px solid #ddc9cc; }
 .faq-list summary { cursor: pointer; font-size: 14px; font-weight: 600; line-height: 1.6; }
-.faq-list details p { color: var(--muted); font-size: 13px; line-height: 1.9; }
-.closing-note { background: var(--sage); padding: 65px 28px; text-align: center; color: #fff1e5; position: relative; overflow: hidden; }
-.closing-note .eyebrow { color: var(--gold-light); }.closing-note h2 { font-size: clamp(40px, 5vw, 64px); margin-bottom: 30px; }
-.closing-note em { color: var(--gold-light); }.closing-doodle { position: absolute; right: 5%; top: 45px; font-size: 160px; color: #e1b3b933; transform: rotate(15deg); pointer-events: none; }
 .site-footer { text-align: left; padding: 48px max(28px, calc((100vw - 1268px) / 2)) 24px !important; }
 .footer-top { display: grid; grid-template-columns: 1.2fr .8fr 1.1fr; gap: 44px; padding-bottom: 32px; }
 .footer-top .brand { padding: 0; }.footer-top p { font-size: 12px; line-height: 1.9; color: #d2adb8; }
@@ -75,7 +71,7 @@
 .photo-credit, .photo-credit a { font-size: 10px !important; color: #d2adb8; }
 .footer-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; border-top: 1px solid #633243; padding-top: 24px; font-size: 10px; }
 @media (max-width: 1000px) { .mood-photo { height: 260px; }.editorial-section { padding: 65px 28px; }.feature-copy { padding: 42px 28px; }.feature-workspace { padding: 45px 25px; }.featured-patterns { gap: 16px; }.faq-section { margin: 0 24px 65px; gap: 36px; padding: 36px; }.process-section { padding-top: 8px; } }
-@media (max-width: 760px) { .editorial-section { padding: 48px 20px; }.editorial-heading { flex-direction: column; align-items: flex-start; gap: 20px; }.mood-grid { grid-template-columns: 1fr; gap: 32px; }.mood-photo { height: 330px; }.mood-card:nth-child(2) .mood-photo { margin-top: 0; }.visualizer-feature { grid-template-columns: 1fr; }.feature-workspace { padding: 40px 25px 25px; }.feature-copy { padding: 35px 24px 45px; }.feature-note { font-size: 17px; }.feature-spark { font-size: 65px; }.feature-copy .button { max-width: 100%; }.featured-patterns { grid-template-columns: 1fr 1fr; gap: 24px 16px; }.featured-pattern strong { font-size: 20px; }.process-grid { grid-template-columns: 1fr; gap: 28px; }.process-icon { position: absolute; top: 10px; right: 12px; margin: 14px 0; font-size: 44px; }.faq-section { grid-template-columns: 1fr; padding: 28px 22px; gap: 20px; margin: 0 20px 48px; }.faq-flower { display: none; }.closing-doodle { right: -40px; top: 100px; }.footer-top { grid-template-columns: 1fr; gap: 22px; }.decorative-ribbon { gap: 10px; font-size: 8px; }.decorative-ribbon span:last-child { display: none; } }
+@media (max-width: 760px) { .editorial-section { padding: 48px 20px; }.editorial-heading { flex-direction: column; align-items: flex-start; gap: 20px; }.mood-grid { grid-template-columns: 1fr; gap: 32px; }.mood-photo { height: 330px; }.mood-card:nth-child(2) .mood-photo { margin-top: 0; }.visualizer-feature { grid-template-columns: 1fr; }.feature-workspace { padding: 40px 25px 25px; }.feature-copy { padding: 35px 24px 45px; }.feature-note { font-size: 17px; }.feature-spark { font-size: 65px; }.feature-copy .button { max-width: 100%; }.featured-patterns { grid-template-columns: 1fr 1fr; gap: 24px 16px; }.featured-pattern strong { font-size: 20px; }.process-grid { grid-template-columns: 1fr; gap: 28px; }.process-icon { position: absolute; top: 10px; right: 12px; margin: 14px 0; font-size: 44px; }.faq-section { grid-template-columns: 1fr; padding: 28px 22px; gap: 20px; margin: 0 20px 48px; }.faq-flower { display: none; }.footer-top { grid-template-columns: 1fr; gap: 22px; }.decorative-ribbon { gap: 10px; font-size: 8px; }.decorative-ribbon span:last-child { display: none; } }
 
 
 

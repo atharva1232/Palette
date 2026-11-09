@@ -76,7 +76,11 @@
       <div class="editorial-heading"><div><span class="eyebrow">A MOOD FOR EVERY ROOM</span><h2>What does home <em>feel</em> like?</h2></div><p>There’s no right colour. Just the one that makes you want to stay a little longer.</p></div>
       <div class="mood-grid">@for (mood of moods; track mood.name) {
         <button class="mood-card" type="button" (click)="openMood(mood)">
-          <span class="mood-photo"><img [src]="mood.image" [style.object-position]="mood.position" alt="Neutral living-room inspiration" loading="lazy" width="600" height="700" /><span class="mood-wash" [style.background]="mood.shade"></span><span class="mood-number">{{ mood.number }} / THE MOOD EDIT</span><span class="mood-arrow">↗</span></span>
+          <span class="mood-photo">
+            <img [src]="mood.image" [style.object-position]="mood.position" [alt]="mood.alt" loading="lazy" />
+            @if (mood.tinted) { <span class="mood-wash" [style.background]="mood.shade"></span> }
+            <span class="mood-number">{{ mood.label }}</span><span class="mood-arrow">↗</span>
+          </span>
           <span class="mood-palette">@for (colour of mood.colours; track colour) { <i [style.background]="colour"></i> }</span>
           <strong>{{ mood.name }}</strong><span class="mood-note">{{ mood.note }}</span>
         </button>
@@ -122,7 +126,6 @@
       <div class="process-grid"><article><span>01</span><div class="process-icon" aria-hidden="true">◒</div><h3>Follow a feeling.</h3><p>Browse {{ shades.length }} shades, from grounding earth tones to colours that make a statement.</p><button class="text-button" type="button" (click)="navigate('shades')">Find your shade →</button></article><article><span>02</span><div class="process-icon" aria-hidden="true">✳</div><h3>Play with the details.</h3><p>Try arches, petals, or a timeless stripe. Make it yours with colours and scale.</p><button class="text-button" type="button" (click)="navigate('patterns')">Try a pattern →</button></article><article><span>03</span><div class="process-icon" aria-hidden="true">⌂</div><h3>See the possibility.</h3><p>Upload your room, select its wall, and preview your favourite shade. Compare with the original before you decide.</p><button class="text-button" type="button" (click)="navigate('visualize')">Try your own room →</button></article></div>
     </section>
     <section class="faq-section"><div><span class="eyebrow">A FEW THINGS YOU MIGHT WONDER</span><h2>A little clarity,<br>before you <em>create.</em></h2><span class="faq-flower" aria-hidden="true">✳</span></div><div class="faq-list"><details><summary>Can I try colours on my own room?</summary><p>Yes. Open Visualize, upload a JPG, PNG, or WebP photo, outline only the wall and choose Set wall boundary, then click bare wall with Smart select. Adjust edge tolerance or use Erase to protect objects, try a shade, and download the preview. Editing stays in your browser; saving while logged in stores a private copy in your account.</p></details><details><summary>Can I change the colours in a pattern?</summary><p>Absolutely. Open Patterns, choose a design, and select Customise this pattern. Change the background, pattern colour, style, and scale, then save your version.</p></details><details><summary>Will the paint look exactly like the preview?</summary><p>The photo preview is an impression of your idea. Lighting, screens, wall texture, and paint finish affect the final result. Try a physical paint sample before decorating.</p></details><details><summary>Can other people use my pattern?</summary><p>Yes. Saved patterns appear in the shared collection for people using this same app server. Log in to publish; your account name appears beside your design.</p></details></div></section>
-    <section class="closing-note"><span class="eyebrow">YOUR SPACE. YOUR STORY.</span><h2>Good things start<br>with a <em>little colour.</em></h2><button class="button light" type="button" (click)="navigate('shades')">Let’s find yours ↗</button><span class="closing-doodle" aria-hidden="true">✳</span></section>
   }
   @if (page === 'shades') {
     <section class="collection">
