@@ -36,6 +36,12 @@ app-visualizer .gallery-jump { display: inline-block; margin: 0 0 24px; color: v
 
 .visualizer-workspace .image-editor { grid-area: photo; }
 
+/* Fit the canvas by its aspect ratio so the visible photo and pointer area coincide. */
+.visualizer-workspace .canvas-stage {
+  inline-size: min(100%, calc(min(55svh, 34rem) * var(--room-ratio, 1) + 2px));
+  margin-inline: auto;
+}
+
 .room-reference {
   grid-area: reference;
   display: grid;

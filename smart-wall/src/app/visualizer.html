@@ -81,7 +81,7 @@
 
       @if (boundaryReady()) { <div class="boundary-controls"><strong>✓ Wall {{ activeWall + 1 }} boundary locked</strong><label><input type="checkbox" [(ngModel)]="showBoundary" (ngModelChange)="render()" /> Show boundary</label><span>Paint for this wall stays inside this outline.</span></div> }
 
-      <div class="canvas-stage" [class.loading-photo]="loading()">
+      <div class="canvas-stage" [class.loading-photo]="loading()" [style.--room-ratio]="imageWidth() / (imageHeight() || 1)">
 
         <canvas #preview tabindex="0" role="img" [attr.aria-label]="original ? 'Original room photo' : 'Room preview. Use the outline tool to select a wall.'" aria-describedby="selection-help keyboard-help" (pointerdown)="pointerDown($event)" (pointermove)="pointerMove($event)" (pointerup)="pointerUp($event)" (pointercancel)="pointerUp($event)" (keydown)="keyboard($event)">Your browser needs canvas support to display the room preview.</canvas>
 
