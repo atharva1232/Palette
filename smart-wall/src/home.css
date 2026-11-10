@@ -36,7 +36,7 @@
   grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
   max-width: 1440px;
   margin-inline: auto;
-  background: var(--theme-feature, #efe1db);
+  background: #efe1db;
   overflow: hidden;
 }
 
@@ -55,35 +55,43 @@
 .feature-note { align-self: center; margin-top: 28px; font: italic 19px Georgia, serif; color: var(--maroon); transform: rotate(-3deg); }.feature-note > span { display: inline-block; font-size: 30px; margin-left: 12px; }.feature-spark { position: absolute; right: 10px; bottom: 15px; font-size: 85px; color: #b7718866; }
 .feature-copy { padding: 65px clamp(28px, 9%, 60px); align-self: center; }.feature-copy p { font-size: 14px; color: var(--muted); line-height: 1.9; max-width: 430px; margin: 24px 0; }
 .feature-shades { display: flex; flex-wrap: wrap; gap: 9px; margin: 26px 0; }.feature-shades button { display: flex; align-items: center; gap: 7px; padding: 7px 9px; border: 1px solid transparent; border-radius: 22px; background: var(--theme-soft-surface, #fbf6f280); color: var(--maroon); font-size: 10px; }.feature-shades button.chosen { border-color: var(--maroon); background: var(--theme-surface, #fffaf5); }.feature-shades i { width: 23px; height: 23px; border-radius: 50%; border: 2px solid #fffaf5; }
-:root[data-theme='dark'] .feature-shades button.chosen { background: var(--sage); color: var(--on-accent); border-color: var(--control-border); }
+:root[data-theme='dark'] .feature-shades button {
+  background: #edcbc9;
+  border-color: #97566a;
+}
+:root[data-theme='dark'] .feature-shades button:not(.chosen):hover {
+  background: #e5b9bd;
+  border-color: var(--maroon);
+}
+:root[data-theme='dark'] .feature-shades button.chosen {
+  background: #713343;
+  border-color: #552333;
+  color: var(--on-accent);
+}
 .feature-steps { display: flex; flex-wrap: wrap; gap: 14px; border-top: 1px solid var(--theme-control-border, #d8bdc1); padding-top: 22px; margin: 26px 0; }.feature-steps span { font-size: 10px; color: var(--muted); }.feature-steps b { display: block; color: var(--maroon); font-size: 12px; margin-bottom: 8px; letter-spacing: 1px; }.feature-privacy { display: block; font-size: 10px; line-height: 1.8; color: var(--muted); margin-top: 14px; max-width: 320px; }
 
 :root[data-theme='dark'] .visualizer-feature {
-  --theme-feature: linear-gradient(130deg, #5a203b, #351426);
-  --theme-feature-dot: #ffa6ca65;
-  --theme-feature-workspace: linear-gradient(145deg, #812c50, #4b172e);
-  --theme-soft-surface: #662843;
-  --theme-control-border: #bc718f;
-  --theme-action-fill: linear-gradient(135deg, #ff9bc5, #f36a9e);
-  --theme-action-border: #ffa3c8;
-  --theme-accent-hover: linear-gradient(135deg, #ffc1dc, #ff88b6);
-  --maroon: #ffc1dc;
-  --eyebrow: #ffc1dc;
-  --heading-accent: #ff9ec7;
-  --muted: #f8dce9;
-  --sage: #ffc1dc;
-  --on-accent: #351426;
-  --theme-on-accent: var(--on-accent);
+  --theme-feature-dot: #9b526a42;
+  --theme-feature-workspace: linear-gradient(145deg, #f5d6cb, #e2b0a6);
+  --theme-soft-surface: #f8e7e2;
+  --theme-control-border: #ad747c;
+  --heading-accent: #894759;
 }
 
 :root[data-theme='dark'] .visualizer-feature :is(.feature-photo-label, .feature-divider, .feature-divider > span) {
-  background: #ffe3ee;
-  color: #60213e;
+  background: #fff3ed;
+  color: #773449;
 }
 
-:root[data-theme='dark'] .visualizer-feature .feature-window { background: linear-gradient(145deg, #4b4a61, #353448); }
-:root[data-theme='dark'] .visualizer-feature .feature-toolbar i { background: #ffc1dc; }
-:root[data-theme='dark'] .visualizer-feature .feature-spark { color: #cdbde5; }
+:root[data-theme='dark'] .visualizer-feature .feature-window {
+  --maroon: #6f3045;
+  --muted: #633543;
+  background: linear-gradient(145deg, #fff0e8, #f4c4b9 52%, #e1a097);
+  border-color: #af6871;
+}
+:root[data-theme='dark'] .visualizer-feature .feature-toolbar i { background: #9d5265; }
+:root[data-theme='dark'] .visualizer-feature .feature-note { color: var(--ink); }
+:root[data-theme='dark'] .visualizer-feature .feature-spark { color: #985767; }
 
 .featured-patterns { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
 .featured-pattern { padding: 0; border: 0; text-align: left; background: transparent; color: var(--ink); }

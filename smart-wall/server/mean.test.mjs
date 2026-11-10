@@ -17,7 +17,7 @@ test('MEAN integration: real MongoDB, JWT, roles, photos, catalogues, analytics 
   const directory=mkdtempSync(join(tmpdir(),'smartwall-mean-'));
   const store=await connectMongo({uri:process.env.TEST_MONGODB_URI,name:'test_'+randomUUID().replaceAll('-',''),directory,local:!process.env.TEST_MONGODB_URI,localPort:0});
   const messages=[]; let server,base;
-  const start=async(emailEnabled=true,proxyHops=0)=>{server=await createMeanApi({store,emailEnabled,proxyHops,secret:'test-secret-which-is-longer-than-thirty-two',transport:async m=>messages.push(m)});await new Promise(r=>server.listen(0,'127.0.0.1',r));base='http://127.0.0.1:'+server.address().port;};
+  const start=async(emailEnabled=true,proxyHops=0,passwordResetEnabled=emailEnabled)=>{server=await createMeanApi({store,emailEnabled,passwordResetEnabled,proxyHops,secret:'test-secret-which-is-longer-than-thirty-two',transport:async m=>messages.push(m)});await new Promise(r=>server.listen(0,'127.0.0.1',r));base='http://127.0.0.1:'+server.address().port;};
   const close=async()=>{await new Promise(r=>server.close(r));await server.resourcesClosed;};
   const call=(path,method='GET',body,cookie='',headers={})=>fetch(base+path,{method,headers:{'Content-Type':'application/json','X-SmartWall-Request':'1',Cookie:cookie,...headers},...(body===undefined?{}:{body:JSON.stringify(body)})});
   let alice,bob,ac,bc; const design=room(); design.appearance.patternSource='upload'; design.appearance.texture={name:'custom.png',width:1,height:1,scale:160,pixels:Buffer.from([255,0,0,255]).toString('base64')}; let pid;
@@ -145,6 +145,34 @@ test('MEAN integration: real MongoDB, JWT, roles, photos, catalogues, analytics 
       assert.equal((await call('/api/designs/'+d.id,'GET',undefined,bc)).status,401);
       assert.equal((await call('/api/admin/overview','GET',undefined,cookie)).status,403);
       for(const path of ['forgot-password','resend-verification','verify-email','reset-password']) assert.equal((await call('/api/auth/'+path,'POST',{},cookie)).status,404);
+    });
+    await t.test('resets a password by email without requiring verification at signup', async () => {
+      await close();
+      await start(false, 0, true);
+      const email = 'reset-only@example.test';
+      const original = { name: 'Reset-only user', email, password: 'original-password-123' };
+      const signup = await call('/api/auth/signup', 'POST', original);
+      assert.equal(signup.status, 201);
+      const { user } = await signup.json();
+      const cookie = signup.headers.get('set-cookie').split(';')[0];
+      assert.equal(user.emailVerified, false);
+      assert.equal(await store.db.collection('outbox').countDocuments({ userId: user.id }), 0);
+      assert.deepEqual(await (await call('/api/auth/me')).json(), { user: null, emailEnabled: false, passwordResetEnabled: true });
+      assert.equal((await call('/api/auth/resend-verification', 'POST', {}, cookie)).status, 404);
+      assert.equal((await call('/api/designs', 'POST', room(), cookie)).status, 201);
+      const unknown = await call('/api/auth/forgot-password', 'POST', { email: 'unknown-reset@example.test' });
+      const known = await call('/api/auth/forgot-password', 'POST', { email });
+      assert.equal(unknown.status, 200);
+      assert.equal(known.status, 200);
+      assert.deepEqual(await known.json(), await unknown.json());
+      await server.mail.drain();
+      const token = messages.find(message => message.to === email && message.subject.startsWith('Reset')).text.match(/#reset=([A-Za-z0-9_-]{43})/)[1];
+      const password = 'replacement-password-123';
+      assert.equal((await call('/api/auth/reset-password', 'POST', { token, password })).status, 200);
+      assert.equal((await call('/api/auth/reset-password', 'POST', { token, password })).status, 400);
+      assert.equal((await (await call('/api/auth/me', 'GET', undefined, cookie)).json()).user, null);
+      assert.equal((await call('/api/auth/login', 'POST', { email, password: original.password })).status, 401);
+      assert.equal((await call('/api/auth/login', 'POST', { email, password })).status, 200);
     });
     await t.test('trusted single-proxy clients have independent limits; spoofed leftmost headers cannot bypass them',async()=>{
       await close();await start(false,1);

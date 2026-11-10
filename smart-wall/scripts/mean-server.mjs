@@ -9,7 +9,9 @@ const { origin, proxyHops } = deploymentSettings(process.env, production);
 if (production && (!process.env.MONGODB_URI || !process.env.JWT_SECRET || !origin)) throw new Error('Set MONGODB_URI, JWT_SECRET and HTTPS APP_ORIGIN.');
 const store = await connectMongo({ uri: process.env.MONGODB_URI, name: process.env.MONGODB_DATABASE || 'smartwall', directory: resolve(process.env.DATA_DIRECTORY || '.data'), local: !production });
 await migrateSqlite(store, resolve(process.env.LEGACY_SQLITE_PATH || '.data/smartwall.sqlite'));
-const server = await createMeanApi({ store, production, origin, proxyHops, emailEnabled: process.env.ENABLE_EMAIL_FEATURES === 'true', secret: process.env.JWT_SECRET, frontend: production ? 'dist/smart-wall/browser' : undefined });
+const emailEnabled = process.env.ENABLE_EMAIL_FEATURES === 'true';
+const passwordResetEnabled = emailEnabled || process.env.ENABLE_PASSWORD_RESET === 'true';
+const server = await createMeanApi({ store, production, origin, proxyHops, emailEnabled, passwordResetEnabled, secret: process.env.JWT_SECRET, frontend: production ? 'dist/smart-wall/browser' : undefined });
 // Render Free disks are ephemeral; durable backups must be configured in Atlas/off-host.
 const backups = process.env.LOCAL_BACKUPS_ENABLED === 'false' ? { async run() {}, async stop() {} } : scheduledMongoBackups(store, resolve(process.env.BACKUP_DIR || '.backups'), { hours:Number(process.env.BACKUP_INTERVAL_HOURS || 24), retain:Number(process.env.BACKUP_RETAIN || 7) });
 await backups.run();

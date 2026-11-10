@@ -215,7 +215,8 @@
           <label for="login-password">Password</label>
           <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" [(ngModel)]="login.password" #loginPassword="ngModel" required minlength="8" maxlength="128" />
           @if (loginPassword.invalid && loginPassword.touched) { <small class="error">Enter at least 8 characters.</small> }
-          <button class="button primary full" type="submit" [disabled]="auth.busy() || !auth.ready()">{{ auth.busy() ? 'Logging in…' : 'Log in →' }}</button>@if (auth.emailEnabled()) { <button class="text-button" type="button" (click)="navigate('forgot')">Forgot your password?</button> }
+          <button class="button primary full" type="submit" [disabled]="auth.busy() || !auth.ready()">{{ auth.busy() ? 'Logging in…' : 'Log in →' }}</button>
+          <button class="text-button" type="button" (click)="navigate('forgot')">Forgot your password?</button>
           <p class="switch-text">New here? <button type="button" (click)="navigate('signup')">Create an account</button></p>
         </form>
       } @else {

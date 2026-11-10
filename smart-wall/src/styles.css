@@ -85,7 +85,7 @@ button, input { font-family: inherit; }
   border-color: var(--theme-cocoa-edge);
 }
 
-:root[data-theme='dark'] :is(.studio-preview, .upload-banner, .upload-zone) {
+:root[data-theme='dark'] :is(.studio-preview, .upload-banner, .upload-zone, .visualizer-feature) {
   --ink: #3c2530;
   --muted: #63454f;
   --eyebrow: #783a50;

@@ -26,12 +26,27 @@ Required service environment:
 | MONGODB_DATABASE | smartwall |
 | JWT_SECRET | Generate a stable random secret, at least 32 characters; keep it in Render |
 | ENABLE_EMAIL_FEATURES | false |
+| ENABLE_PASSWORD_RESET | Set to `true` after configuring email delivery below |
 | PASSWORD_HASH_CONCURRENCY | 1 |
 | TRUST_PROXY_HOPS | 1 initially; verify actual proxy topology before acceptance |
 | MONGOMS_DISABLE_POSTINSTALL | 1 |
 | LOCAL_BACKUPS_ENABLED | false on ephemeral Render Free disk |
 
 Do not set APP_ORIGIN to a guessed URL: startup automatically reads RENDER_EXTERNAL_URL. Set APP_ORIGIN explicitly only if using a custom HTTPS origin. PORT comes from Render. Never run npm start on Render: that is the local development launcher.
+
+## Password reset emails
+
+Render Free blocks the usual SMTP ports, including Gmail SMTP on port 465. Use an HTTPS email API on this service. For Brevo, verify the sender in Brevo, enable transactional sending, and create an API key. Set these variables in the Render service’s Environment page together:
+
+| Variable | Value |
+| --- | --- |
+| `ENABLE_PASSWORD_RESET` | `true` |
+| `MAIL_MODE` | `brevo` |
+| `BREVO_SENDER_EMAIL` | Sender email verified in Brevo |
+| `BREVO_API_KEY` | API key entered directly in Render |
+| `MAIL_ENCRYPTION_KEY` | Stable, separate random secret of at least 32 characters for the mail queue |
+
+Keep `ENABLE_EMAIL_FEATURES=false` if signup should work without email verification. After deploying, request a reset from **Log in → Forgot your password?** with a test account whose inbox you control. Verify receipt, open the link, and sign in with the new password. Links expire in 30 minutes and work once.
 
 Local filesystem backups are disabled on Render because they vanish on restart and copying the whole media collection at every cold start wastes memory and bandwidth. Configure an appropriate free Atlas backup option if offered without charges, or perform private off-host exports and a restore drill. Replication is not a substitute for a recoverable backup. Do not claim durable automated backups are complete until verified.
 

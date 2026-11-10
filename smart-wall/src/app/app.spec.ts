@@ -15,6 +15,15 @@ describe('Palettè', () => {
     TestBed.inject(HttpTestingController).expectOne('/api/auth/me').flush({ user: null });
   });
   afterEach(() => { const http=TestBed.inject(HttpTestingController); for(const r of http.match(req=>['/api/catalog','/api/settings','/api/account/favourites'].includes(req.url))) { r.flush(reqDefault(r.request.url)); } http.verify(); });
+  it('keeps the password reset entry point visible without signup verification', async () => {
+    const fixture = TestBed.createComponent(App);
+    fixture.componentInstance.navigate('login');
+    await fixture.whenStable();
+    const buttons = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('button'));
+    buttons.find(button => button.textContent?.trim() === 'Forgot your password?')!.click();
+    await fixture.whenStable();
+    expect(fixture.componentInstance.page).toBe('forgot');
+  });
   it('opens verification links without sending their token to an API or leaving it in the address bar', async () => {
     const token = 't'.repeat(43);
     window.history.replaceState(null, '', '/#verify=' + token);

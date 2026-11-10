@@ -1,4 +1,4 @@
-/* Upload callouts used by the photo visualizer. */
+/* Shared styles for the photo visualizer. */
 .visualizer-page .wall-picker { margin-bottom: 16px; padding: 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--theme-soft-surface, #f3e8e1); }
 .wall-picker .selection-tools { margin-top: 10px; }
 .wall-picker p { margin: 8px 0 0; color: var(--detail-text); font-size: 12px; line-height: 1.5; }
@@ -22,6 +22,29 @@ app-visualizer .save-design { border-top: 1px solid var(--border); margin-top: 2
 app-visualizer .save-design input { width: 100%; border: 1px solid var(--control-border); border-radius: 7px; padding: 10px; background: var(--field); color: var(--ink); font-size: 12px; }
 app-visualizer .save-design > button { width: 100%; margin-top: 12px; }
 app-visualizer .gallery-jump { display: inline-block; margin: 0 0 24px; color: var(--maroon); font-size: 13px; text-underline-offset: 4px; }
+
+app-visualizer .wall-quick-guide {
+  margin-top: 32px;
+  padding: clamp(18px, 3vw, 30px);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+}
+app-visualizer .wall-quick-guide h2 { margin: 10px 0 18px; font: 400 26px/1.2 Georgia, serif; }
+app-visualizer .wall-quick-guide ol {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px 30px;
+  margin: 0;
+  padding-inline-start: 20px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+app-visualizer .wall-quick-guide li::marker { color: var(--maroon); font-weight: 700; }
+app-visualizer .wall-quick-guide strong { display: block; color: var(--ink); }
+@media (max-width: 800px) { app-visualizer .wall-quick-guide ol { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) { app-visualizer .wall-quick-guide ol { grid-template-columns: 1fr; } }
 
 .account-error { padding: 14px 24px; background: var(--sage-light); color: var(--maroon); font-size: 13px; }
 

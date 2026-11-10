@@ -30,6 +30,25 @@ test('Gmail recipient rejection leaves delivery failed for queue retry', async (
   const send = mailTransport(mailConfiguration(options), () => ({ sendMail: async () => ({ accepted: [], rejected: ['recipient@example.com'] }) }));
   await assert.rejects(send({ to: 'recipient@example.com' }, 'job'), /did not accept/);
 });
+test('Brevo sends reset links over HTTPS and reports provider failures for retry', async t => {
+  const config = mailConfiguration({
+    mode: 'brevo', production: true, key: 'a'.repeat(32),
+    brevoApiKey: 'test-api-key', brevoSenderEmail: 'sender@example.test',
+  });
+  const message = recoveryMessage('recipient@example.test', 'reset', 'https://palette.example.test', 'safe-token');
+  const fetchMock = t.mock.method(globalThis, 'fetch', async () => new Response(null, { status: 201 }));
+  await mailTransport(config)(message, 'reset-job');
+  const [url, request] = fetchMock.mock.calls[0].arguments;
+  assert.equal(url, 'https://api.brevo.com/v3/smtp/email');
+  assert.equal(request.method, 'POST');
+  assert.equal(request.headers['api-key'], 'test-api-key');
+  assert.deepEqual(JSON.parse(request.body), {
+    sender: { name: 'Palettè', email: 'sender@example.test' },
+    to: [{ email: message.to }], subject: message.subject, textContent: message.text, htmlContent: message.html,
+  });
+  fetchMock.mock.mockImplementation(async () => new Response(null, { status: 429 }));
+  await assert.rejects(mailTransport(config)(message, 'reset-job'), /Email provider returned 429/);
+});
 test('Mail encryption key survives switching from local files to Gmail', () => {
   const directory = mkdtempSync(join(tmpdir(), 'smartwall-mail-'));
   try {

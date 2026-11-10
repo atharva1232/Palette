@@ -20,11 +20,13 @@ const hex = value => typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value);
 const publicUser = u => ({ id: u._id, name: u.name, email: u.email, emailVerified: !!u.verifiedAt, role: u.role });
 const patternPublic = p => { const { _id, ...rest } = p; return { ...rest, id: _id }; };
 const summary = p => ({ id: p.id, name: p.name, savedAt: p.savedAt, createdAt: p.createdAt, updatedAt: p.updatedAt, fileName: p.fileName, color: p.color, photoUrl: `/api/designs/${p.id}/photo`, previewUrl: `/api/designs/${p.id}/preview` });
-export async function createMeanApi({ store, origin = 'http://127.0.0.1:4200', production = false, secret, frontend, transport, emailEnabled = false, proxyHops = 0, mail: mailOptions = {} }) {
+export async function createMeanApi({ store, origin = 'http://127.0.0.1:4200', production = false, secret, frontend, transport, emailEnabled = false, passwordResetEnabled = emailEnabled, proxyHops = 0, mail: mailOptions = {} }) {
   if (production && (!origin.startsWith('https://') || !secret || secret.length < 32)) throw new Error('Production requires HTTPS APP_ORIGIN and JWT_SECRET (32+ characters).');
   const key = new TextEncoder().encode(secret || localSecret(store.directory, '.jwt-key'));
   const { db } = store;
-  const mail = emailEnabled ? createMongoMailQueue(db, mailConfiguration({ production, directory: store.directory, ...mailOptions }), transport) : { async drain() {}, async stop() {}, async enqueue() { throw new Error('Email features are disabled.'); } };
+  const mail = emailEnabled || passwordResetEnabled
+    ? createMongoMailQueue(db, mailConfiguration({ production, directory: store.directory, ...mailOptions }), transport)
+    : { async drain() {}, async stop() {}, async enqueue() { throw new Error('Email features are disabled.'); } };
   const recovery = mongoRecovery(store, mail, origin);
   const seed = JSON.parse(readFileSync(new URL('./catalog-seed.json', import.meta.url), 'utf8'));
   for (const c of seed.colours) { const { id, ...data } = c; await db.collection('colours').updateOne({ _id: id }, { $setOnInsert: { ...data, active: true } }, { upsert: true }); }
@@ -78,7 +80,7 @@ export async function createMeanApi({ store, origin = 'http://127.0.0.1:4200', p
     res.setHeader('Set-Cookie', cookie(token, 604800));
   };
   app.get('/api/health', async (req, res) => { await db.command({ ping: 1 }); res.json({ status: 'ok', stack: 'MEAN' }); });
-  app.get('/api/auth/me', (req, res) => res.json({ user: req.user ? publicUser(req.user) : null, emailEnabled }));
+  app.get('/api/auth/me', (req, res) => res.json({ user: req.user ? publicUser(req.user) : null, emailEnabled, passwordResetEnabled }));
   for (const kind of ['signup', 'login']) app.post('/api/auth/' + kind, async (req, res) => {
     limit('auth-ip:' + req.ip, 30);
     const v = req.body;
@@ -97,8 +99,8 @@ export async function createMeanApi({ store, origin = 'http://127.0.0.1:4200', p
     res.json({ user: publicUser(u) });
   });
   app.post('/api/auth/logout', async (req, res) => { if (req.sessionHash) await db.collection('sessions').deleteOne({ _id: req.sessionHash }); res.setHeader('Set-Cookie', cookie('', 0)); res.json({ ok: true }); });
-  // Optional email flows stay unavailable when the internship build has no sender.
-  for (const path of ['forgot-password', 'resend-verification', 'verify-email', 'reset-password']) app.post('/api/auth/' + path, (req, res, next) => { if (!emailEnabled) return res.status(404).json({ error: 'Email features are not enabled for this project.' }); next(); });
+  if (!passwordResetEnabled) app.post(['/api/auth/forgot-password', '/api/auth/reset-password'], (_req, res) => res.status(404).json({ error: 'Password reset emails are unavailable.' }));
+  if (!emailEnabled) app.post(['/api/auth/resend-verification', '/api/auth/verify-email'], (_req, res) => res.status(404).json({ error: 'Email verification is unavailable.' }));
   app.post('/api/auth/forgot-password', async (req, res) => {
     limit('recover:' + req.ip, 10);
     if (!text(req.body?.email, 254) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(req.body.email.trim())) fail(400, 'Enter a valid email.');

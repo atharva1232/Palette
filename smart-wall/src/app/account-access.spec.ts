@@ -7,7 +7,7 @@ import { Auth } from './auth';
 describe('Account recovery screens', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({ imports: [AccountAccess], providers: [provideHttpClient(), provideHttpClientTesting()] }).compileComponents();
-    TestBed.inject(Auth); TestBed.inject(HttpTestingController).expectOne('/api/auth/me').flush({ user: null });
+    TestBed.inject(Auth); TestBed.inject(HttpTestingController).expectOne('/api/auth/me').flush({ user: null, emailEnabled: false, passwordResetEnabled: true });
   });
   afterEach(() => TestBed.inject(HttpTestingController).verify());
   it('requests reset links and uses a neutral response for the email address', async () => {
@@ -20,6 +20,15 @@ describe('Account recovery screens', () => {
     expect(request.request.body).toEqual({ email: 'someone@example.test' });
     request.flush({ message: 'If an account exists, check your email.' });
     await fixture.whenStable(); expect(element.textContent).toContain('If an account exists');
+  });
+  it('explains that emails are unavailable when delivery is disabled', async () => {
+    TestBed.inject(Auth).passwordResetEnabled.set(false);
+    const fixture = TestBed.createComponent(AccountAccess);
+    fixture.componentRef.setInput('mode', 'forgot');
+    await fixture.whenStable();
+    const element = fixture.nativeElement as HTMLElement;
+    expect(element.textContent).toContain('Password reset emails are currently unavailable.');
+    expect(element.querySelector('form')).toBeNull();
   });
   it('rejects mismatched reset passwords without consuming the token', async () => {
     const fixture = TestBed.createComponent(AccountAccess); fixture.componentRef.setInput('mode', 'reset'); fixture.componentRef.setInput('token', 't'.repeat(43));

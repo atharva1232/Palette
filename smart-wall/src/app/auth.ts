@@ -11,12 +11,18 @@ export class Auth {
   readonly user = signal<Account | null>(null);
   readonly ready = signal(false);
   readonly emailEnabled = signal(false);
+  readonly passwordResetEnabled = signal(false);
   readonly busy = signal(false);
   readonly error = signal('');
   readonly notice = signal('');
   constructor() {
-    this.http.get<{ user: Account | null; emailEnabled?: boolean }>('/api/auth/me').subscribe({
-      next: result => { this.emailEnabled.set(result.emailEnabled === true); this.user.set(result.user); this.ready.set(true); },
+    this.http.get<{ user: Account | null; emailEnabled?: boolean; passwordResetEnabled?: boolean }>('/api/auth/me').subscribe({
+      next: result => {
+        this.emailEnabled.set(result.emailEnabled === true);
+        this.passwordResetEnabled.set((result.passwordResetEnabled ?? result.emailEnabled) === true);
+        this.user.set(result.user);
+        this.ready.set(true);
+      },
       error: () => { this.ready.set(true); this.error.set('The server is unavailable. Please try again.'); },
     });
   }
