@@ -79,11 +79,34 @@ button, input { font-family: inherit; }
 }
 
 :root[data-theme='dark'] :is(
-  .studio-preview, .room-reference, .upload-banner, .upload-zone:not(.drag-over),
-  .dashboard-grid .feature-card:nth-child(2), .trial-page form, .admin-page form
+  .room-reference, .dashboard-grid .feature-card:nth-child(2), .trial-page form, .admin-page form
 ) {
   background: var(--theme-cocoa-panel);
   border-color: var(--theme-cocoa-edge);
+}
+
+:root[data-theme='dark'] :is(.studio-preview, .upload-banner, .upload-zone) {
+  --ink: #3c2530;
+  --muted: #63454f;
+  --eyebrow: #783a50;
+  --maroon: #773449;
+  --gold: #894759;
+  --border: #bd8790;
+  --control-border: var(--border);
+  --sage: #8e4057;
+  --sage-light: #f3d5d3;
+  --on-accent: #fff8f4;
+  --theme-on-accent: var(--on-accent);
+  --theme-action-fill: linear-gradient(135deg, #a3465d, #843649);
+  --theme-accent-hover: linear-gradient(135deg, #91374f, #722c40);
+  --theme-action-border: #9b5164;
+  background: linear-gradient(145deg, #fff9f5, #f7dfdb 70%, #efcbc9);
+  border-color: var(--border);
+  color: var(--ink);
+}
+
+:root[data-theme='dark'] .upload-zone.drag-over {
+  background: linear-gradient(145deg, #fff4ee, #efcbc9);
 }
 
 :root[data-theme='dark'] :is(
