@@ -3,8 +3,103 @@
 @import './upload-banner.css';
 *, *::before, *::after { box-sizing: border-box; }
 :root { --ivory: #fbf6f2; --ink: #3b202a; --sage: #713343; --sage-light: #f4e5e7; --maroon: #713343; --gold: #b77188; --gold-light: #f5e6dc; --muted: #806b72; --border: #eadbda; }
-body { margin: 0; font-family: Arial, Helvetica, sans-serif; background: var(--ivory); }
+:root {
+  --surface: #fffdfa;
+  --control: #fffaf6;
+  --field: #fffbf8;
+  --control-border: #ddc9cc;
+  --eyebrow: #87465a;
+  --heading-accent: #a26376;
+  --on-accent: #fff8f0;
+  --detail-text: #6b5059;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --page-background: #1b1b1b;
+  --ivory: #3b2b32;
+  --ink: #fff7f1;
+  --sage: #edb7c2;
+  --sage-light: #5b3944;
+  --maroon: #f7cbd1;
+  --gold: #f6dec9;
+  --gold-light: #65434a;
+  --muted: #ecd6d5;
+  --border: #a6757f;
+  --surface: #6a4450;
+  --control: #704955;
+  --field: #482f38;
+  --control-border: #c49099;
+  --eyebrow: #f7cbd1;
+  --heading-accent: var(--gold);
+  --on-accent: #3b202a;
+  --detail-text: var(--muted);
+  --theme-rose-panel: linear-gradient(145deg, #744650, #492e3c);
+  --theme-rose-edge: #a77482;
+  --theme-cocoa-panel: linear-gradient(145deg, #65493c, #3e302c);
+  --theme-cocoa-edge: #a38168;
+  --theme-lavender-panel: linear-gradient(145deg, #554762, #36313f);
+  --theme-lavender-edge: #8f7ca0;
+  --theme-surface: linear-gradient(145deg, #79505b, #583844);
+  --theme-soft-surface: linear-gradient(145deg, #69434e, #4d343e);
+  --theme-field: var(--field);
+  --theme-control-border: var(--control-border);
+  --theme-action-fill: linear-gradient(135deg, #f9e4df, #e8abb9);
+  --theme-action-border: #e7b7c0;
+  --theme-on-accent: var(--on-accent);
+  --theme-accent-hover: linear-gradient(135deg, #fff3e9, #f6c0ca);
+  --theme-heading-accent: var(--maroon);
+  --theme-shell: linear-gradient(115deg, #482535, #302331);
+  --theme-shell-text: var(--ink);
+  --theme-ribbon: var(--theme-cocoa-panel);
+  --theme-pattern-band: var(--theme-soft-surface);
+  --theme-decoration: var(--gold);
+  --theme-error: #ffb5bf;
+  --theme-error-surface: #59263a;
+  --theme-media-matte: var(--field);
+}
+
+body { margin: 0; font-family: Arial, Helvetica, sans-serif; background: var(--page-background, var(--ivory)); }
 button, input { font-family: inherit; }
+:root[data-theme='dark'] :is(input, textarea)::placeholder { color: var(--muted); opacity: 1; }
+
+/* Rose for colour and account controls, cocoa for room references, lavender for patterns and help. */
+:root[data-theme='dark'] :is(
+  .shade-card, .auth-card, .access-card, .paint-panel, .wall-picker,
+  .dashboard-grid .feature-card:first-child, .admin-page .metrics > article
+) {
+  background: var(--theme-rose-panel);
+  border-color: var(--theme-rose-edge);
+}
+
+:root[data-theme='dark'] :is(
+  .studio-preview, .room-reference, .upload-banner, .upload-zone:not(.drag-over),
+  .dashboard-grid .feature-card:nth-child(2), .trial-page form, .admin-page form
+) {
+  background: var(--theme-cocoa-panel);
+  border-color: var(--theme-cocoa-edge);
+}
+
+:root[data-theme='dark'] :is(
+  .pattern-card, .pattern-builder, .privacy-note, .pattern-upload-card, .pattern-selection-help,
+  .dashboard-grid .feature-card:nth-child(3), .design-card, .gallery-empty,
+  .admin-page .catalog-list article
+) {
+  background: var(--theme-lavender-panel);
+  border-color: var(--theme-lavender-edge);
+}
+
+:root[data-theme='dark'] .guide li {
+  margin-bottom: 12px;
+  padding: 12px 18px;
+  border: 1px solid var(--theme-lavender-edge);
+  border-radius: 12px;
+  background: var(--theme-lavender-panel);
+}
+
+:root[data-theme='dark'] app-visualizer .primary-action { background: var(--theme-action-fill); }
+:root[data-theme='dark'] app-visualizer .primary-action:hover:not(:disabled) { background: var(--theme-accent-hover); }
+:root[data-theme='dark'] :is(.filters button.chosen, .feature-shades button.chosen, .studio-tabs button.active, .selection-tools button.selected, .access-card button.primary, .trial-page button[type='submit'], .admin-page button.active, .admin-page button[type='submit'], .delete-confirmation button:first-of-type):hover:not(:disabled) { background: var(--theme-accent-hover); }
 
 
 

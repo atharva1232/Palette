@@ -13,6 +13,10 @@
       @if (auth.user()?.role === 'admin') { <button type="button" (click)="navigate('admin')">Admin</button> }
       <button type="button" [disabled]="auth.busy()" (click)="logout()">Log out</button>
     }
+    <button type="button" class="button theme-toggle" [attr.aria-pressed]="darkMode()" (click)="toggleTheme()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M20.5 15.5A8.5 8.5 0 0 1 8.5 3.5a9 9 0 1 0 12 12Z" /></svg>
+      Dark mode
+    </button>
   </nav>
 </header>
 <main>

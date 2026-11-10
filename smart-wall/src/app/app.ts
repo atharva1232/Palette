@@ -1,4 +1,4 @@
-import { Component, HostListener, Injector, afterNextRender, inject, signal, effect } from '@angular/core';
+import { Component, DOCUMENT, HostListener, Injector, afterNextRender, inject, signal, effect } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { NgTemplateOutlet } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
@@ -12,6 +12,7 @@ import { UserGuide } from './user-guide';
 import { Catalogue } from './catalogue';
 import { Activity } from './activity';
 type Page = 'home' | 'visualize' | 'shades' | 'patterns' | 'login' | 'signup' | 'dashboard' | 'forgot' | 'verify' | 'reset' | 'feedback' | 'admin' | 'help';
+const themePreference = 'smartwall-theme';
 
 @Component({
   imports: [FormsModule, NgTemplateOutlet, Visualizer, AccountAccess, TrialFeedback, AdminPanel, UserGuide],
@@ -22,6 +23,8 @@ type Page = 'home' | 'visualize' | 'shades' | 'patterns' | 'login' | 'signup' | 
 export class App {
   private readonly http = inject(HttpClient);
   private readonly injector = inject(Injector);
+  private readonly document = inject(DOCUMENT);
+  readonly darkMode = signal(this.readDarkMode());
   page: Page = 'home';
   visualizerOpened = false;
   readonly auth = inject(Auth);
@@ -35,8 +38,24 @@ export class App {
   readonly catalogue = inject(Catalogue);
   private activity = inject(Activity);
   settings = signal({siteName:'SmartWall',maintenance:false,allowPublishing:true});
-  constructor() { this.consumeAccountLink(); this.loadSettings(); effect(()=>{ if(this.auth.user()) this.catalogue.loadFavourites(); else this.catalogue.favourites.set([]); }); }
+  constructor() { this.applyTheme(); this.consumeAccountLink(); this.loadSettings(); effect(()=>{ if(this.auth.user()) this.catalogue.loadFavourites(); else this.catalogue.favourites.set([]); }); }
   loadSettings():void { this.http.get<any>('/api/settings').subscribe({next:s=>this.settings.set(s),error:()=>{}}); }
+
+  private readDarkMode(): boolean {
+    try { return this.document.defaultView?.localStorage.getItem(themePreference) === 'dark'; }
+    catch { return false; }
+  }
+
+  private applyTheme(): void {
+    this.document.documentElement.dataset['theme'] = this.darkMode() ? 'dark' : 'light';
+  }
+
+  toggleTheme(): void {
+    this.darkMode.update(enabled => !enabled);
+    this.applyTheme();
+    try { this.document.defaultView?.localStorage.setItem(themePreference, this.darkMode() ? 'dark' : 'light'); }
+    catch { /* The switch still works when browser storage is unavailable. */ }
+  }
 
   @HostListener('window:hashchange')
   consumeAccountLink(): void {
