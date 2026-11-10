@@ -1,4 +1,4 @@
-# SmartWall — MEAN wall paint visualizer
+# Palettè — MEAN wall paint visualizer
 
 Angular 22, Express 5, MongoDB and Node.js 24 with JWT authentication.
 
@@ -60,7 +60,7 @@ Tests use disposable databases/accounts. test:api includes real-MongoDB integrat
 - [Participant trial](USER_TRIAL.md)
 - [Photo credits](public/images/CREDITS.md)
 
-End-user guidance is available through How to use SmartWall in the footer.
+End-user guidance is available through How to use Palettè in the footer.
 
 ## Applying patterns to your own photo
 
@@ -74,4 +74,4 @@ Optional extra, disabled by default for the internship submission. Enable only w
 
 ## Free internship hosting
 
-See [DEPLOYMENT-RENDER.md](DEPLOYMENT-RENDER.md) and the repository-root render.yaml for Render Free + Atlas Free. Account setup is pending; no public SmartWall URL is live yet.
+Palettè is hosted on [Render](https://smart-wall-atharva1232.onrender.com/). See [DEPLOYMENT-RENDER.md](DEPLOYMENT-RENDER.md) and the repository-root `render.yaml` for the Render Free and Atlas Free setup.

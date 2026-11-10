@@ -17,4 +17,4 @@ let stopping = false;
 const stop = () => { if (stopping) return; stopping = true; server.close(); server.resourcesClosed.then(async () => { await backups.stop(); await store.close(); }); setTimeout(() => server.closeAllConnections(), 5000).unref(); };
 for (const signal of ['SIGINT','SIGTERM']) process.on(signal, stop);
 server.on('error', async error => { console.error(error.message); await server.mail.stop(); await store.close(); process.exitCode = 1; });
-server.listen(Number(process.env.PORT || 3001), process.env.HOST || (production ? '0.0.0.0' : '127.0.0.1'), () => console.log('SmartWall MEAN API ready: Express + MongoDB + JWT'));
+server.listen(Number(process.env.PORT || 3001), process.env.HOST || (production ? '0.0.0.0' : '127.0.0.1'), () => console.log('Palettè MEAN API ready: Express + MongoDB + JWT'));

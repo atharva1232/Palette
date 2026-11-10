@@ -11,13 +11,13 @@ test('email verification, recovery tokens, revocation, private feedback and prod
   const directory = mkdtempSync(join(tmpdir(), 'smartwall-recovery-'));
   const file = join(directory, 'app.sqlite');
   const frontend = join(directory, 'frontend'); mkdirSync(frontend);
-  writeFileSync(join(frontend, 'index.html'), '<!doctype html><title>SmartWall trial</title>');
+  writeFileSync(join(frontend, 'index.html'), '<!doctype html><title>Palettè trial</title>');
   writeFileSync(join(frontend, 'main-ABCDEFGH.js'), 'console.log("test")');
   const messages = [];
   let server;
   let url;
   const start = async () => {
-    server = createApi({ file, frontend, production: true, origin: 'https://wall.example.test', mail: { mode: 'resend', apiKey: 'test-only', from: 'SmartWall <hello@example.test>', key: 'test-only-encryption-secret-with-32-characters' }, transport: async message => { messages.push(message); } });
+    server = createApi({ file, frontend, production: true, origin: 'https://wall.example.test', mail: { mode: 'resend', apiKey: 'test-only', from: 'Palettè <hello@example.test>', key: 'test-only-encryption-secret-with-32-characters' }, transport: async message => { messages.push(message); } });
     await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
     url = `http://127.0.0.1:${server.address().port}`;
   };
@@ -101,7 +101,7 @@ test('email verification, recovery tokens, revocation, private feedback and prod
     });
     await t.test('serves the compiled app with no-referrer and excludes source/private paths', async () => {
       const response = await call('/');
-      assert.equal(response.status, 200); assert.match(await response.text(), /SmartWall trial/);
+      assert.equal(response.status, 200); assert.match(await response.text(), /Palettè trial/);
       assert.equal(response.headers.get('referrer-policy'), 'no-referrer');
       assert.match(response.headers.get('content-security-policy'), /frame-ancestors 'none'/);
       assert.match((await call('/main-ABCDEFGH.js')).headers.get('cache-control'), /immutable/);

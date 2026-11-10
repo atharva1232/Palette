@@ -1,6 +1,6 @@
 # Internship workspace
 
-SmartWall is in [smart-wall](smart-wall/README.md).
+Palettè is in [smart-wall](smart-wall/README.md).
 
 ```powershell
 cd smart-wall

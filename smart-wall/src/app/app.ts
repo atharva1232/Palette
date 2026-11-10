@@ -37,7 +37,7 @@ export class App {
   accountLinkToken = '';
   readonly catalogue = inject(Catalogue);
   private activity = inject(Activity);
-  settings = signal({siteName:'SmartWall',maintenance:false,allowPublishing:true});
+  settings = signal({siteName:'Palettè',maintenance:false,allowPublishing:true});
   constructor() { this.applyTheme(); this.consumeAccountLink(); this.loadSettings(); effect(()=>{ if(this.auth.user()) this.catalogue.loadFavourites(); else this.catalogue.favourites.set([]); }); }
   loadSettings():void { this.http.get<any>('/api/settings').subscribe({next:s=>this.settings.set(s),error:()=>{}}); }
 

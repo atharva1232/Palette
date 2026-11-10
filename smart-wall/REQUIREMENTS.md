@@ -29,7 +29,7 @@ Source of truth: the eight supplied internship screenshots, transcribed in PRD.m
 | 6–7 interconnected functional pages | Home, Visualize, Shades, Patterns, Login, Signup, Dashboard, Help, Feedback, role-restricted Admin | Implemented |
 | Database schema | DATABASE.md; actual schema validators/indexes and collection relationships | Delivered |
 | PRD | PRD.md | Delivered |
-| User documentation | How to use SmartWall page in footer; task instructions and FAQ | Delivered |
+| User documentation | How to use Palettè page in footer; task instructions and FAQ | Delivered |
 | Developer documentation | README.md, BACKEND.md, DATABASE.md, DEPLOYMENT-AWS.md, environment example | Delivered |
 | Upload/save/session/satisfaction KPIs | Admin overview refreshes every 15s; 90-day events, active-visit estimate, private ratings | Implemented; metric definitions disclosed |
 | Cloud deployment with domain | Dockerfile and AWS ECS/Atlas guide prepared | **Pending accounts, cost approval and actual deployment** |

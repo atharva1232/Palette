@@ -43,18 +43,18 @@ export interface WallPattern {
 }
 
 export const starterPatterns: WallPattern[] = [
-  { id: 'pinstripe', name: 'The Burgundy Stripe', author: 'SmartWall', style: 'Stripes', base: '#f1e1d7', ink: '#713343', scale: 40 },
-  { id: 'diagonal', name: 'Rose in Motion', author: 'SmartWall', style: 'Diagonal', base: '#ecd6d4', ink: '#a26a76', scale: 48 },
-  { id: 'dots', name: 'Sunday Confetti', author: 'SmartWall', style: 'Dots', base: '#f0e8db', ink: '#92513d', scale: 32 },
-  { id: 'grid', name: 'Quiet Geometry', author: 'SmartWall', style: 'Grid', base: '#dfe5dc', ink: '#6e8170', scale: 48 },
-  { id: 'checker', name: 'Cocoa Check', author: 'SmartWall', style: 'Checkerboard', base: '#e8d6c2', ink: '#876657', scale: 64 },
-  { id: 'blue-stripe', name: 'Coastal Lines', author: 'SmartWall', style: 'Stripes', base: '#e4e9e5', ink: '#72869c', scale: 56 },
-  { id: 'deco-arches', name: 'Deco After Dark', author: 'SmartWall', style: 'Arches', base: '#432433', ink: '#d3ac77', scale: 64 },
-  { id: 'blush-petals', name: 'Blush Botanica', author: 'SmartWall', style: 'Petals', base: '#f5e4df', ink: '#b77188', scale: 72 },
-  { id: 'terracotta-tide', name: 'Terracotta Tide', author: 'SmartWall', style: 'Scallops', base: '#f0d8c0', ink: '#b9674d', scale: 48 },
-  { id: 'gilded-diamonds', name: 'Gilded Hour', author: 'SmartWall', style: 'Diamonds', base: '#f4ead8', ink: '#b58c40', scale: 64 },
-  { id: 'sage-weave', name: 'Sage Atelier', author: 'SmartWall', style: 'Crosshatch', base: '#e7e9dc', ink: '#7b8256', scale: 40 },
-  { id: 'rose-chevron', name: 'Rose Chevron', author: 'SmartWall', style: 'Chevron', base: '#ead4d6', ink: '#87465a', scale: 64 },
+  { id: 'pinstripe', name: 'The Burgundy Stripe', author: 'Palettè', style: 'Stripes', base: '#f1e1d7', ink: '#713343', scale: 40 },
+  { id: 'diagonal', name: 'Rose in Motion', author: 'Palettè', style: 'Diagonal', base: '#ecd6d4', ink: '#a26a76', scale: 48 },
+  { id: 'dots', name: 'Sunday Confetti', author: 'Palettè', style: 'Dots', base: '#f0e8db', ink: '#92513d', scale: 32 },
+  { id: 'grid', name: 'Quiet Geometry', author: 'Palettè', style: 'Grid', base: '#dfe5dc', ink: '#6e8170', scale: 48 },
+  { id: 'checker', name: 'Cocoa Check', author: 'Palettè', style: 'Checkerboard', base: '#e8d6c2', ink: '#876657', scale: 64 },
+  { id: 'blue-stripe', name: 'Coastal Lines', author: 'Palettè', style: 'Stripes', base: '#e4e9e5', ink: '#72869c', scale: 56 },
+  { id: 'deco-arches', name: 'Deco After Dark', author: 'Palettè', style: 'Arches', base: '#432433', ink: '#d3ac77', scale: 64 },
+  { id: 'blush-petals', name: 'Blush Botanica', author: 'Palettè', style: 'Petals', base: '#f5e4df', ink: '#b77188', scale: 72 },
+  { id: 'terracotta-tide', name: 'Terracotta Tide', author: 'Palettè', style: 'Scallops', base: '#f0d8c0', ink: '#b9674d', scale: 48 },
+  { id: 'gilded-diamonds', name: 'Gilded Hour', author: 'Palettè', style: 'Diamonds', base: '#f4ead8', ink: '#b58c40', scale: 64 },
+  { id: 'sage-weave', name: 'Sage Atelier', author: 'Palettè', style: 'Crosshatch', base: '#e7e9dc', ink: '#7b8256', scale: 40 },
+  { id: 'rose-chevron', name: 'Rose Chevron', author: 'Palettè', style: 'Chevron', base: '#ead4d6', ink: '#87465a', scale: 64 },
 ];
 
 export function patternBackground(pattern: Omit<WallPattern, 'id'>): string {

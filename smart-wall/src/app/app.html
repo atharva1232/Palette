@@ -93,7 +93,7 @@
     <section class="visualizer-feature" aria-labelledby="visualizer-feature-title">
       <div class="feature-workspace">
         <div class="feature-window">
-          <div class="feature-toolbar"><span><i></i><i></i><i></i></span><span>SMARTWALL / COLOUR STUDIO</span><span aria-hidden="true">↗</span></div>
+          <div class="feature-toolbar"><span><i></i><i></i><i></i></span><span>PALETTÈ / COLOUR STUDIO</span><span aria-hidden="true">↗</span></div>
           <div class="feature-photo">
             <img src="images/lounge.jpg" width="1600" height="1067" loading="lazy" alt="Compare the original living room with a new colour on its accent wall" />
             <ng-container *ngTemplateOutlet="sampleWallPaint; context: { background: featureColor, clip: 'inset(0 0 0 ' + featureReveal + '%)' }" />
@@ -133,7 +133,7 @@
   }
   @if (page === 'shades') {
     <section class="collection">
-      <div class="collection-heading"><div><span class="eyebrow">THE COLOUR LIBRARY · {{ shades.length }} SHADES</span><h1>Find your kind of colour.</h1><p class="description">From barely-there neutrals to rich, expressive tones. Pick a shade and see your room in a new light.</p></div><span class="edition">THE SMARTWALL COLLECTION<br>Thoughtfully coloured. Endlessly yours.</span></div>
+      <div class="collection-heading"><div><span class="eyebrow">THE COLOUR LIBRARY · {{ shades.length }} SHADES</span><h1>Find your kind of colour.</h1><p class="description">From barely-there neutrals to rich, expressive tones. Pick a shade and see your room in a new light.</p></div><span class="edition">THE PALETTÈ COLLECTION<br>Thoughtfully coloured. Endlessly yours.</span></div>
       <div class="studio-layout">
         <div class="library">
           <label class="search-label" for="shade-search">Search the collection</label>
@@ -203,7 +203,7 @@
   }
   @if (page === 'login' || page === 'signup') {
     <section class="auth-section"><div class="auth-card">
-      <span class="eyebrow">WELCOME TO SMARTWALL</span>
+      <span class="eyebrow">WELCOME TO PALETTÈ</span>
       <h1>{{ page === 'login' ? 'Welcome back.' : 'Make room for colour.' }}</h1>
       @if (auth.error()) { <p class="error" role="alert">{{ auth.error() }}</p> }
       <p class="demo-note">Save your room designs privately and return to them whenever inspiration strikes.</p>
@@ -252,6 +252,6 @@
     </section>
   }
 </main>
-<footer class="site-footer"><div class="footer-top"><div><button class="brand" type="button" (click)="navigate('home')">◈ {{ settings().siteName }}</button><p>A little inspiration for the places<br>we call our own.</p></div><div><span class="eyebrow">COME EXPLORE</span><button type="button" (click)="navigate('home')">Home</button><button type="button" (click)="navigate('visualize')">Visualize your room</button><button type="button" (click)="navigate('shades')">The shade library</button><button type="button" (click)="navigate('patterns')">The pattern studio</button><button type="button" (click)="navigate('help')">How to use SmartWall</button><button type="button" (click)="navigate('feedback')">Share trial feedback</button></div><div><span class="eyebrow">MADE FOR YOUR IMAGINATION</span><p>{{ shades.length }} shades. {{ starterPatterns.length }} original patterns.<br>Endless ways to make it yours.</p><p class="photo-credit">Room photos: <a href="https://unsplash.com/photos/gray-sofa-near-white-wall--TiONiwniJs" target="_blank" rel="noopener noreferrer">Zac Gudakov</a> &amp; <a href="https://unsplash.com/photos/gray-cushion-couch-beside-white-wall-qY3pLOIpt4w" target="_blank" rel="noopener noreferrer">dix sept</a> / Unsplash</p></div></div><div class="footer-bottom"><span>SmartWall · Imagine your space in colour.</span><span>Designed for a home that feels like you.</span></div></footer>
+<footer class="site-footer"><div class="footer-top"><div><button class="brand" type="button" (click)="navigate('home')">◈ {{ settings().siteName }}</button><p>A little inspiration for the places<br>we call our own.</p></div><div><span class="eyebrow">COME EXPLORE</span><button type="button" (click)="navigate('home')">Home</button><button type="button" (click)="navigate('visualize')">Visualize your room</button><button type="button" (click)="navigate('shades')">The shade library</button><button type="button" (click)="navigate('patterns')">The pattern studio</button><button type="button" (click)="navigate('help')">How to use Palettè</button><button type="button" (click)="navigate('feedback')">Share trial feedback</button></div><div><span class="eyebrow">MADE FOR YOUR IMAGINATION</span><p>{{ shades.length }} shades. {{ starterPatterns.length }} original patterns.<br>Endless ways to make it yours.</p><p class="photo-credit">Room photos: <a href="https://unsplash.com/photos/gray-sofa-near-white-wall--TiONiwniJs" target="_blank" rel="noopener noreferrer">Zac Gudakov</a> &amp; <a href="https://unsplash.com/photos/gray-cushion-couch-beside-white-wall-qY3pLOIpt4w" target="_blank" rel="noopener noreferrer">dix sept</a> / Unsplash</p></div></div><div class="footer-bottom"><span>Palettè · Imagine your space in colour.</span><span>Designed for a home that feels like you.</span></div></footer>
 
 

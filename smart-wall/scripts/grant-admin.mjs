@@ -9,5 +9,5 @@ try {
   const db=client.db(process.env.MONGODB_DATABASE || 'smartwall');
   await db.collection('admin_invitations').updateOne({_id:email},{$set:{approvedAt:Date.now()}},{upsert:true});
   const result = await users.updateOne({ email, disabled: { $ne: true }, ...(process.env.ENABLE_EMAIL_FEATURES === 'true' ? { verifiedAt: { $ne: null } } : {}) }, { $set: { role: 'admin' } });
-  console.log(result.matchedCount ? 'Administrator role granted. Reload SmartWall.' : 'Administrator invitation reserved. Register this address, then rerun this local operator command. No password has been created.');
+  console.log(result.matchedCount ? 'Administrator role granted. Reload Palettè.' : 'Administrator invitation reserved. Register this address, then rerun this local operator command. No password has been created.');
 } finally { await client.close(); }

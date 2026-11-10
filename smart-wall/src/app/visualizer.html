@@ -104,20 +104,24 @@
     </div>
 
     <aside class="room-reference" aria-label="Original room and quick controls">
-      <span class="eyebrow">BEFORE YOU BEGIN</span><h2>Your original room.</h2>
-      @if (originalPhotoUrl()) { <img class="original-room-preview" [src]="originalPhotoUrl()" alt="Original uploaded room before painting" /> }
-      <p>Your original photo stays unchanged.</p>
-      <div class="selected-paint"><span [style.background]="appearance.mode === 'pattern' ? appearance.pattern.base : color"></span><div><strong>{{ appearance.mode === 'pattern' ? (appearance.patternSource === 'upload' ? appearance.texture?.name : appearance.pattern.name) : selectedName }}</strong><small>{{ appearance.mode === 'pattern' && appearance.patternSource === 'upload' ? 'Your uploaded pattern' : appearance.mode === 'pattern' ? appearance.pattern.base + ' / ' + appearance.pattern.ink : color.toUpperCase() }}</small></div></div>
+      <div class="room-reference-photo">
+        <span class="eyebrow">BEFORE YOU BEGIN</span><h2>Your original room.</h2>
+        @if (originalPhotoUrl()) { <img class="original-room-preview" [src]="originalPhotoUrl()" alt="Original uploaded room before painting" /> }
+        <p>Your original photo stays unchanged.</p>
+      </div>
+      <div class="room-reference-options">
+        <div class="selected-paint"><span [style.background]="appearance.mode === 'pattern' ? appearance.pattern.base : color"></span><div><strong>{{ appearance.mode === 'pattern' ? (appearance.patternSource === 'upload' ? appearance.texture?.name : appearance.pattern.name) : selectedName }}</strong><small>{{ appearance.mode === 'pattern' && appearance.patternSource === 'upload' ? 'Your uploaded pattern' : appearance.mode === 'pattern' ? appearance.pattern.base + ' / ' + appearance.pattern.ink : color.toUpperCase() }}</small></div></div>
 
-      <nav class="studio-shortcuts" aria-label="Editor options">
-        <button type="button" (click)="openControls('colours',true)">Colours &amp; dual tone</button>
-        <button type="button" aria-label="Explore patterns &amp; upload your own ↗" (click)="openControls('patterns',true)">Patterns &amp; upload</button>
-        <button type="button" (click)="openControls('adjust',true)">Fine tune</button>
-        <button type="button" (click)="openControls('save',true)">Save &amp; download</button>
-      </nav>
+        <nav class="studio-shortcuts" aria-label="Editor options">
+          <button type="button" (click)="openControls('colours',true)">Colours &amp; dual tone</button>
+          <button type="button" aria-label="Explore patterns &amp; upload your own ↗" (click)="openControls('patterns',true)">Patterns &amp; upload</button>
+          <button type="button" (click)="openControls('adjust',true)">Fine tune</button>
+          <button type="button" (click)="openControls('save',true)">Save &amp; download</button>
+        </nav>
+      </div>
     </aside>
-    <section #controls class="paint-panel studio-controls" aria-label="Design options below preview">
-      <div class="studio-control-heading"><div><span class="eyebrow">MAKE IT YOURS</span><h2>A little change. A new feeling.</h2></div></div>
+    <section #controls class="paint-panel studio-controls" aria-labelledby="studio-controls-title">
+      <div class="studio-control-heading"><span class="eyebrow">MAKE IT YOURS</span><h2 id="studio-controls-title">Paint your walls</h2></div>
       <nav class="studio-tabs" aria-label="Design controls">@for (tab of controlTabs; track tab.id) { <button type="button" [class.active]="controlTab===tab.id" [attr.aria-pressed]="controlTab===tab.id" (click)="openControls(tab.id)">{{ tab.label }}</button> }</nav>
       <label for="paint-mode">Paint style</label><select id="paint-mode" [(ngModel)]="appearance.mode" (ngModelChange)="changeMode()"><option value="solid">Solid colour</option><option value="dual">Dual tone</option><option value="pattern">Pattern</option></select>
 

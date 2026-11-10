@@ -5,7 +5,7 @@ export interface Colour { id: string; name: string; hex: string; family: string;
 @Injectable({ providedIn: 'root' })
 export class Catalogue {
   private http = inject(HttpClient);
-  readonly colours = signal<Colour[]>(shades.map((s,i) => ({ ...s, id: 'shade-'+(i+1), brand: 'SmartWall concept palette', finishes: ['Matte','Satin','Gloss'] })));
+  readonly colours = signal<Colour[]>(shades.map((s,i) => ({ ...s, id: 'shade-'+(i+1), brand: 'Palettè concept palette', finishes: ['Matte','Satin','Gloss'] })));
   readonly patterns = signal<WallPattern[]>(starterPatterns);
   readonly publishedPatterns = signal<WallPattern[]>([]);
   readonly requestedPattern = signal<WallPattern|null>(null);

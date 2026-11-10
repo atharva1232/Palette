@@ -1,4 +1,4 @@
-# Smart Wall Paint Visualizer — product requirements
+# Palettè — wall paint visualizer product requirements
 
 Source: the eight internship brief screenshots supplied by the project owner. This document records requirements; implementation evidence and remaining external tasks are in REQUIREMENTS.md.
 

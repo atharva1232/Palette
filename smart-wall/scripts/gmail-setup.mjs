@@ -50,7 +50,7 @@ try {
     const content = `${kept}\nMAIL_MODE=gmail\nGMAIL_USER=${gmailUser}\nGMAIL_APP_PASSWORD=${gmailPassword}\n`;
     await writeFile(file + '.tmp', content, { mode: 0o600 });
     await rename(file + '.tmp', file); await chmod(file, 0o600);
-    console.log('Gmail authenticated. Private settings saved to ignored .env.local. Restart npm start, then use Resend verification or Forgot password in SmartWall.');
+    console.log('Gmail authenticated. Private settings saved to ignored .env.local. Restart npm start, then use Resend verification or Forgot password in Palettè.');
   } else console.log('Gmail authenticated successfully. No email was sent.');
 } catch (error) {
   console.error(error.message); process.exitCode = 1;

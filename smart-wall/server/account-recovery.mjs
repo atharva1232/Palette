@@ -22,8 +22,8 @@ export function accountRecovery(db, mail, origin) {
         db.prepare('INSERT INTO account_tokens VALUES (?,?,?,?,?)').run(tokenHash(token), user.id, purpose, expires, now);
         mail.enqueue(user.id, purpose, {
           to: user.email,
-          subject: purpose === 'verify' ? 'Verify your SmartWall email' : 'Reset your SmartWall password',
-          text: purpose === 'verify' ? `Confirm your email address for SmartWall:\n\n${url}\n\nThis single-use link expires in 24 hours. If you did not create an account, ignore this email.` : `Choose a new password for SmartWall:\n\n${url}\n\nThis single-use link expires in 30 minutes. If you did not request this, ignore this email; your password has not changed.`,
+          subject: purpose === 'verify' ? 'Verify your Palettè email' : 'Reset your Palettè password',
+          text: purpose === 'verify' ? `Confirm your email address for Palettè:\n\n${url}\n\nThis single-use link expires in 24 hours. If you did not create an account, ignore this email.` : `Choose a new password for Palettè:\n\n${url}\n\nThis single-use link expires in 30 minutes. If you did not request this, ignore this email; your password has not changed.`,
         }, expires);
       };
       if (insideTransaction) issue(); else transaction(issue);
@@ -54,7 +54,7 @@ export function accountRecovery(db, mail, origin) {
         db.prepare('DELETE FROM sessions WHERE user_id=?').run(row.user_id);
         db.prepare('DELETE FROM account_tokens WHERE user_id=?').run(row.user_id);
         db.prepare('DELETE FROM mail_outbox WHERE user_id=?').run(row.user_id);
-        mail.enqueue(row.user_id, 'password-changed', { to: user.email, subject: 'Your SmartWall password changed', text: 'Your SmartWall password has been changed and all existing sessions were signed out. If this was not you, request a new password-reset link immediately.' }, Date.now() + 24 * 60 * 60_000);
+        mail.enqueue(row.user_id, 'password-changed', { to: user.email, subject: 'Your Palettè password changed', text: 'Your Palettè password has been changed and all existing sessions were signed out. If this was not you, request a new password-reset link immediately.' }, Date.now() + 24 * 60 * 60_000);
       });
     },
   };

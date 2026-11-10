@@ -600,7 +600,7 @@ export class Visualizer implements OnDestroy {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `smartwall-${this.color.slice(1)}.png`;
+      link.download = `palette-${this.color.slice(1)}.png`;
       link.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
       this.status.set('Your painted room preview is ready to download.');

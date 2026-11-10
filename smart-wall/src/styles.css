@@ -60,6 +60,12 @@
 }
 
 body { margin: 0; font-family: Arial, Helvetica, sans-serif; background: var(--page-background, var(--ivory)); }
+
+/* Match the compact desktop view while leaving touch layouts at their native size. */
+@media (min-width: 64rem) and (hover: hover) and (pointer: fine) {
+  body { zoom: 0.8; }
+}
+
 button, input { font-family: inherit; }
 :root[data-theme='dark'] :is(input, textarea)::placeholder { color: var(--muted); opacity: 1; }
 

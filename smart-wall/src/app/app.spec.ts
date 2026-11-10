@@ -6,9 +6,9 @@ import { By } from '@angular/platform-browser';
 import { Visualizer } from './visualizer';
 import { Auth } from './auth';
 
-const reqDefault=(url:string):any => url === '/api/catalog' ? { colours: [], patterns: [] } : url === '/api/account/favourites' ? [] : {siteName:'SmartWall',maintenance:false,allowPublishing:true};
+const reqDefault=(url:string):any => url === '/api/catalog' ? { colours: [], patterns: [] } : url === '/api/account/favourites' ? [] : {siteName:'Palettè',maintenance:false,allowPublishing:true};
 
-describe('SmartWall', () => {
+describe('Palettè', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({ imports: [App], providers: [provideHttpClient(), provideHttpClientTesting()] }).compileComponents();
     TestBed.inject(Auth);

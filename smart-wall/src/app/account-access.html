@@ -1,5 +1,5 @@
 <section class="access-page"><div class="access-card">
-  <span class="eyebrow">YOUR SMARTWALL ACCOUNT</span>
+  <span class="eyebrow">YOUR PALETTÈ ACCOUNT</span>
   <h1>{{ mode() === 'forgot' ? 'A fresh start.' : mode() === 'verify' ? 'Make it official.' : 'Your next password.' }}</h1>
   @if (auth.error()) { <p class="error" role="alert">{{ auth.error() }}</p> }
   @if (complete()) { <p class="success" role="status">{{ message() }}</p><button type="button" class="primary" (click)="returnToLogin.emit()">Continue →</button> }

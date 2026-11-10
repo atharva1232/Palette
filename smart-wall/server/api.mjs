@@ -196,7 +196,7 @@ export function createApi({ file = fileURLToPath(new URL('../.data/smartwall.sql
         const keys = ['upload', 'select', 'save', 'reopen', 'delete'];
         if (!value || !Number.isInteger(value.ease) || value.ease < 1 || value.ease > 5 || !Number.isInteger(value.accuracy) || value.accuracy < 1 || value.accuracy > 5 || !['desktop', 'mobile', 'tablet'].includes(value.device) || typeof value.comment !== 'string' || value.comment.length > 2000 || !value.tasks || !keys.every(key => typeof value.tasks[key] === 'boolean')) fail(400, 'Complete the feedback ratings and device type.');
         db.prepare('INSERT INTO trial_feedback VALUES (?,?,?,?,?,?,?)').run(randomUUID(), now, value.ease, value.accuracy, value.device, JSON.stringify(Object.fromEntries(keys.map(key => [key, value.tasks[key]]))), value.comment.trim());
-        return send(201, { message: 'Thank you. Your feedback has been saved privately for the SmartWall trial.' });
+        return send(201, { message: 'Thank you. Your feedback has been saved privately for the Palettè trial.' });
       }
       fail(404, 'Not found.');
     } catch (error) {
@@ -225,5 +225,5 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
     server.close();
     setTimeout(() => server.closeAllConnections(), 5000).unref();
   });
-  server.listen(Number(process.env.PORT || 3001), process.env.HOST || '127.0.0.1', () => console.log('SmartWall API ready on port ' + (process.env.PORT || 3001)));
+  server.listen(Number(process.env.PORT || 3001), process.env.HOST || '127.0.0.1', () => console.log('Palettè API ready on port ' + (process.env.PORT || 3001)));
 }

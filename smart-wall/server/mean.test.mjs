@@ -28,6 +28,23 @@ test('MEAN integration: real MongoDB, JWT, roles, photos, catalogues, analytics 
   }] };
   try {
     await start();
+    await t.test('updates existing site and catalogue branding without replacing custom metadata', async () => {
+      assert.equal((await (await call('/api/settings')).json()).siteName, 'Palettè');
+      await store.db.collection('settings').updateOne({ _id: 'system' }, { $set: { siteName: 'SmartWall', maintenance: true } });
+      await store.db.collection('colours').updateOne({ _id: 'shade-1' }, { $set: { brand: 'SmartWall concept palette' } });
+      await store.db.collection('colours').updateOne({ _id: 'shade-2' }, { $set: { brand: 'Custom palette' } });
+      await store.db.collection('patterns').updateOne({ _id: 'pinstripe' }, { $set: { author: 'SmartWall' } });
+      await close();
+      await start();
+      const settings = await (await call('/api/settings')).json();
+      assert.equal(settings.siteName, 'Palettè');
+      assert.equal(settings.maintenance, true);
+      const catalogue = await (await call('/api/catalog')).json();
+      assert.equal(catalogue.colours.find(colour => colour.id === 'shade-1').brand, 'Palettè concept palette');
+      assert.equal(catalogue.colours.find(colour => colour.id === 'shade-2').brand, 'Custom palette');
+      assert.equal(catalogue.patterns.find(pattern => pattern.id === 'pinstripe').author, 'Palettè');
+      await store.db.collection('settings').updateOne({ _id: 'system' }, { $set: { maintenance: false } });
+    });
     await t.test('rejects anonymous admin, forged signup roles and cross-origin writes',async()=>{
       assert.equal((await call('/api/admin/overview')).status,401);
       assert.equal((await call('/api/auth/signup','POST',{},'',{Origin:'https://evil.test'})).status,403);
@@ -72,7 +89,7 @@ test('MEAN integration: real MongoDB, JWT, roles, photos, catalogues, analytics 
       assert.equal((await call('/api/admin/projects/'+alice.id+'/'+design.id+'/review','POST',{},ac)).status,400);
       const reviewed=await (await call('/api/admin/projects/'+alice.id+'/'+design.id+'/review','POST',{reason:'Synthetic support test'},ac)).json();assert.equal(reviewed.photo,png);
       assert.ok(await store.db.collection('audit').findOne({action:'review-private-design'}));
-      assert.equal((await call('/api/admin/settings','POST',{siteName:'SmartWall Test',maintenance:true,allowPublishing:false},ac)).status,200);
+      assert.equal((await call('/api/admin/settings','POST',{siteName:'Custom Studio',maintenance:true,allowPublishing:false},ac)).status,200);
       assert.equal((await call('/api/patterns','POST',pattern,bc)).status,409);
     });
     await t.test('records metrics, private feedback and account disabling revokes sessions',async()=>{
@@ -90,6 +107,7 @@ test('MEAN integration: real MongoDB, JWT, roles, photos, catalogues, analytics 
     });
     await t.test('survives API restart then resets password and revokes old JWTs',async()=>{
       await close();await start();assert.equal((await (await call('/api/designs','GET',undefined,ac)).json()).length,1);assert.deepEqual((await (await call('/api/designs/'+design.id,'GET',undefined,ac)).json()).appearance.texture,design.appearance.texture);
+      assert.equal((await (await call('/api/settings')).json()).siteName, 'Custom Studio');
       await call('/api/auth/forgot-password','POST',{email:alice.email});await server.mail.drain();
       const token=messages.find(m=>m.subject.includes('Reset')).text.match(/#reset=([A-Za-z0-9_-]{43})/)[1];
       assert.equal((await call('/api/auth/reset-password','POST',{token,password:'new-password-123'})).status,200);

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 @Component({ selector:'app-user-guide', template: `
-<section class="guide"><span>SMARTWALL · HOW TO USE</span><h1>From your room to your next idea.</h1>
+<section class="guide"><span>PALETTÈ · HOW TO USE</span><h1>From your room to your next idea.</h1>
 <p>Use a clear, well-lit room photo you own or have permission to use. Avoid including people or personal documents.</p>
 <ol><li><h2>Create your account</h2><p>Choose Get started, enter your name/email and a password of at least eight characters. Log in to save designs to your account. Guests can save in their current browser.</p></li>
 <li><h2>Upload a room</h2><p>Open Visualize and upload a JPG, PNG or WebP up to 15 MB, or try the sample room. Editing happens on your device. The original photo is sent to the server only when you save to an account.</p></li>

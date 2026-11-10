@@ -29,7 +29,11 @@ export async function createMeanApi({ store, origin = 'http://127.0.0.1:4200', p
   const seed = JSON.parse(readFileSync(new URL('./catalog-seed.json', import.meta.url), 'utf8'));
   for (const c of seed.colours) { const { id, ...data } = c; await db.collection('colours').updateOne({ _id: id }, { $setOnInsert: { ...data, active: true } }, { upsert: true }); }
   for (const p of seed.patterns) { const { id, ...data } = p; await db.collection('patterns').updateOne({ _id: id }, { $setOnInsert: { ...data, ownerId: null, starter: true, active: true, createdAt: Date.now() } }, { upsert: true }); }
-  await db.collection('settings').updateOne({ _id: 'system' }, { $setOnInsert: { siteName: 'SmartWall', maintenance: false, allowPublishing: true } }, { upsert: true });
+  const settings = db.collection('settings');
+  await settings.updateOne({ _id: 'system' }, { $setOnInsert: { siteName: 'Palettè', maintenance: false, allowPublishing: true } }, { upsert: true });
+  await settings.updateOne({ _id: 'system', siteName: 'SmartWall' }, { $set: { siteName: 'Palettè' } });
+  await db.collection('colours').updateMany({ brand: 'SmartWall concept palette' }, { $set: { brand: 'Palettè concept palette' } });
+  await db.collection('patterns').updateMany({ starter: true, ownerId: null, author: 'SmartWall' }, { $set: { author: 'Palettè' } });
   if (!Number.isInteger(proxyHops) || proxyHops < 0 || proxyHops > 5) throw new Error('Invalid trusted proxy hop count.');
   const app = express(); app.disable('x-powered-by'); app.set('trust proxy', proxyHops);
   const limit = rateLimiter();
@@ -220,7 +224,7 @@ export async function createMeanApi({ store, origin = 'http://127.0.0.1:4200', p
     await db.collection('colours').updateOne({ _id: id }, { $set: { name: v.name.trim(), hex: v.hex, family: v.family.trim(), brand: v.brand.trim(), finishes: [...new Set(v.finishes)], tags: [v.family.trim()], active: v.active !== false } }, { upsert: true }); await audit(req, 'save-colour', id); res.json({ id });
   });
   app.post('/api/admin/patterns', async (req, res) => {
-    const p = validatePattern({ ...req.body, author: 'SmartWall' }); if (!p) fail(400, 'Invalid pattern.'); const id = req.body.id || randomUUID(); if (!idOK(id)) fail(400, 'Invalid pattern ID.');
+    const p = validatePattern({ ...req.body, author: 'Palettè' }); if (!p) fail(400, 'Invalid pattern.'); const id = req.body.id || randomUUID(); if (!idOK(id)) fail(400, 'Invalid pattern ID.');
     await db.collection('patterns').updateOne({ _id: id }, { $set: { ...p, description: String(req.body.description || '').slice(0,500), category: p.style, active: req.body.active !== false }, $setOnInsert: { starter: true, ownerId: null, createdAt: Date.now() } }, { upsert: true }); await audit(req, 'save-pattern', id); res.json({ id });
   });
   for (const collection of ['colours','patterns']) app.delete('/api/admin/' + collection + '/:id', async (req, res) => { if (!idOK(req.params.id)) fail(400, 'Invalid ID.'); await db.collection(collection).updateOne({ _id: req.params.id }, { $set: { active: false } }); await audit(req, 'archive-' + collection, req.params.id); res.json({ ok: true }); });

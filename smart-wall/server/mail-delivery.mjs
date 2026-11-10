@@ -9,7 +9,7 @@ export function mailConfiguration({ production, directory, mode = process.env.MA
   if (mode === 'gmail') {
     if (!/^[A-Za-z0-9._%+-]+@gmail\.com$/i.test(gmailUser || '') || !/^[A-Za-z]{16}$/.test((gmailPassword || '').replace(/\s/g, ''))) throw new Error('Set GMAIL_USER and a 16-letter Google app password using npm run mail:setup:gmail.');
     gmailPassword = gmailPassword.replace(/\s/g, '');
-    from = `SmartWall <${gmailUser}>`;
+    from = `Palettè <${gmailUser}>`;
   }
   if (production && (!key || key.length < 32)) throw new Error('Set MAIL_ENCRYPTION_KEY to a random secret of at least 32 characters.');
   if (!key) {

@@ -1,4 +1,4 @@
-# First SmartWall user trial
+# First Palettè user trial
 
 Status: the feedback form and test procedure are ready. No real participants have been invited or observed yet. Automated checks and synthetic test feedback must not be counted as real usability evidence.
 

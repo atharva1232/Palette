@@ -1,4 +1,4 @@
-<section class="trial-page"><span class="eyebrow">THE FIRST SMARTWALL TRIAL</span><h1>A little feedback.<br>A better room experience.</h1><p>Try the five tasks below, then tell us what worked and what felt difficult. Around 10 minutes is enough.</p>
+<section class="trial-page"><span class="eyebrow">THE FIRST PALETTÈ TRIAL</span><h1>A little feedback.<br>A better room experience.</h1><p>Try the five tasks below, then tell us what worked and what felt difficult. Around 10 minutes is enough.</p>
   @if (message()) { <p class="success" role="status">{{ message() }}</p> }
   @else { <form #form="ngForm" (ngSubmit)="send(form)" novalidate>
     <fieldset><legend>Which tasks did you complete?</legend>@for (step of steps; track step.key) { <label class="check"><input type="checkbox" [name]="step.key" [(ngModel)]="tasks[step.key]" />{{ step.name }}</label> }<small>Use a duplicate design for deletion so you keep your favourite.</small></fieldset>

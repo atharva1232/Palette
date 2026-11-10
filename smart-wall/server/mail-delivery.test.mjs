@@ -8,7 +8,7 @@ import { recoveryMessage } from './recovery-message.mjs';
 const options = { mode: 'gmail', gmailUser: 'sender@gmail.com', gmailPassword: 'abcd efgh ijkl mnop', key: 'a'.repeat(32) };
 test('Gmail configuration fixes sender and rejects incomplete credentials and production file mode', () => {
   const config = mailConfiguration({ ...options, production: true, from: 'Spoof <other@example.com>' });
-  assert.equal(config.from, 'SmartWall <sender@gmail.com>');
+  assert.equal(config.from, 'Palettè <sender@gmail.com>');
   assert.equal(config.gmailPassword, 'abcdefghijklmnop');
   assert.throws(() => mailConfiguration({ ...options, gmailPassword: 'normal-password' }), /app password/);
   assert.throws(() => mailConfiguration({ ...options, gmailUser: 'sender@gmail.com\r\nBcc: other@example.com' }), /GMAIL_USER/);

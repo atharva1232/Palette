@@ -34,7 +34,7 @@ export function mongoRecovery(store, mail, origin) {
           await db.collection('sessions').deleteMany({ userId: user._id }, { session });
           await db.collection('tokens').deleteMany({ userId: user._id }, { session });
           await db.collection('outbox').deleteMany({ userId: user._id }, { session });
-          await mail.enqueue(user._id, 'password-changed', { to: user.email, subject: 'Your SmartWall password changed', text: 'Your password changed and all sessions were signed out. Request recovery immediately if this was not you.' }, Date.now() + 86400000, session);
+          await mail.enqueue(user._id, 'password-changed', { to: user.email, subject: 'Your Palettè password changed', text: 'Your password changed and all sessions were signed out. Request recovery immediately if this was not you.' }, Date.now() + 86400000, session);
         }
         return user._id;
       });

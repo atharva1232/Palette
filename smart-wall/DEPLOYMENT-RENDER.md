@@ -1,6 +1,6 @@
 # Free Render + MongoDB Atlas deployment
 
-Status: source uploaded to https://github.com/atharva1232/Smart-Wall. One free service is created at https://dashboard.render.com/web/srv-dbmt4d3rjlhs73cdtmm0. Its first cloud build passed; startup awaits the owner-entered Atlas connection and JWT secret. The owner confirmed that Atlas Free is ready. No live deployment is claimed yet. Stay on free plans; do not add a card, paid disk, cron, Redis or Render Postgres.
+Palettè runs on the [existing free Render service](https://dashboard.render.com/web/srv-dbmt4d3rjlhs73cdtmm0) with MongoDB Atlas. See the [live site](https://smart-wall-atharva1232.onrender.com/) and the [GitHub repository](https://github.com/atharva1232/Smart-Wall). The steps below document the original free-plan setup.
 
 ## Owner setup
 

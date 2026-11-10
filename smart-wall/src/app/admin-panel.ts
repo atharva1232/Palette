@@ -9,7 +9,7 @@ import { patternStyles, patternBackground, WallPattern } from './catalog';
 @Component({
   selector: 'app-admin-panel', imports: [FormsModule, DatePipe, DecimalPipe], styleUrl: './admin-panel.css',
   template: `
-  <section class="admin-page"><span class="eyebrow">SMARTWALL MANAGEMENT</span><h1>Studio control.</h1><p>Manage the catalogue, accounts and service. Private design reviews are recorded in the audit log.</p>
+  <section class="admin-page"><span class="eyebrow">PALETTÈ MANAGEMENT</span><h1>Studio control.</h1><p>Manage the catalogue, accounts and service. Private design reviews are recorded in the audit log.</p>
   <nav aria-label="Admin sections">@for (item of tabs; track item) { <button type="button" [class.active]="tab === item" (click)="tab=item; load()">{{ item }}</button> }</nav>
   @if (error()) { <p class="error" role="alert">{{ error() }}</p> } @if (message()) { <p role="status">{{ message() }}</p> }
   <button type="button" (click)="load()" [disabled]="busy()">Refresh</button>
@@ -40,11 +40,11 @@ export class AdminPanel implements OnDestroy {
   error=signal(''); message=signal(''); busy=signal(false); overview=signal<any>(null);
   colours=signal<any[]>([]); patterns=signal<any[]>([]); users=signal<any[]>([]); projects=signal<any[]>([]); feedback=signal<any[]>([]); audits=signal<any[]>([]); reviewed=signal<any>(null);
   reviewReason=''; styles=patternStyles; background=patternBackground;
-  colour:any={}; pattern:any={}; settings={siteName:'SmartWall',maintenance:false,allowPublishing:true};
+  colour:any={}; pattern:any={}; settings={siteName:'Palettè',maintenance:false,allowPublishing:true};
   private timer= setInterval(()=>{ if(this.tab==='Overview' && document.visibilityState==='visible') void this.load(); },15000);
   constructor(){this.resetColour();this.resetPattern();void this.load();}
   format(value:unknown):string { return JSON.stringify(value); }
-  resetColour():void {this.colour={name:'',hex:'#713343',family:'Neutrals',brand:'SmartWall concept palette',finishes:['Matte'],active:true};}
+  resetColour():void {this.colour={name:'',hex:'#713343',family:'Neutrals',brand:'Palettè concept palette',finishes:['Matte'],active:true};}
   resetPattern():void {this.pattern={name:'',description:'',style:'Stripes',base:'#f0e8db',ink:'#713343',scale:40,active:true};}
   editColour(c:any):void{this.colour=structuredClone(c);}
   editPattern(p:any):void{this.pattern=structuredClone(p);}
