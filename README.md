@@ -4,6 +4,8 @@ Palettè is a wall paint visualizer that lets you try colours and patterns on a 
 
 [Open the live demo](https://smart-wall-atharva1232.onrender.com/)
 
+[Read the detailed internship project report](PROJECT_REPORT.md)
+
 ## Features
 
 - Preview solid colours, dual tones, built-in patterns, or an uploaded texture on selected walls.
@@ -44,7 +46,5 @@ npm run test:api
 | [Deployment on Render](smart-wall/DEPLOYMENT-RENDER.md) | Atlas, production configuration, and Brevo password resets |
 | [Backend and API](smart-wall/BACKEND.md) | Routes, authentication, and local operations |
 | [Database](smart-wall/DATABASE.md) | Schema, migration, backups, and restores |
-| [Local Gmail setup](smart-wall/GMAIL_SETUP.md) | Optional Gmail SMTP testing |
 | [Product requirements](smart-wall/PRD.md) · [Implementation status](smart-wall/REQUIREMENTS.md) | Internship scope and supporting evidence |
-| [User trial guide](smart-wall/USER_TRIAL.md) | Trial tasks and feedback collection |
 | [Photo credits](smart-wall/public/images/CREDITS.md) | Image attribution |

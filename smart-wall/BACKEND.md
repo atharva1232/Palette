@@ -50,7 +50,7 @@ Uploads are successful client photo loads (including samples/reopens), not indep
 
 Use one API/mail worker for the internship trial. Rate limits are per-process; multi-instance production needs distributed limits and leased mail/backup jobs. Local MongoDB is loopback-only; cloud must use authenticated TLS connections. Logical backups target the internship dataset; use managed backup capacity for larger workloads.
 
-Environment variables are documented in .env.example. Development also loads ignored .env.local without overriding explicit process environment. Production uses service environment only. Gmail SMTP setup and delivery checks are documented in GMAIL_SETUP.md. Tests use isolated databases. npm run check:release checks the actual production launcher without provisioning hosting or delivering real email.
+See the [environment template](.env.example) for configuration. Development also loads ignored `.env.local` without overriding explicit process environment. Production uses the service environment. Tests use isolated databases. Run `npm run check:release` to exercise the production launcher with test data.
 
 ## Account email
 

@@ -49,7 +49,7 @@ The [product requirements](PRD.md) capture the supplied internship brief. The [p
 ## Remaining evaluation
 
 - Verify that disposable saved designs survive a cloud redeploy and document an off-host backup and restore drill.
-- Record participant outcomes if running the optional [desktop and tablet trial](USER_TRIAL.md).
+- Record participant outcomes if running the optional desktop and tablet evaluation described in the [project report](../PROJECT_REPORT.md#limitations-and-future-work).
 
 ## Explicitly not missing from Phase 1
 
