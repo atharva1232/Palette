@@ -4,7 +4,7 @@
 
 ## Authentication
 
-JWT HS256 with fixed issuer/audience, JTI, expiry and user authVersion. Tokens stay in HttpOnly SameSite cookies (Secure in production), never localStorage. The hashed session record and current database role/status are checked on each request. Logout/reset/disable revoke sessions. Public signup ignores role input. Admin invitations are operator-controlled and require email verification.
+JWT HS256 with fixed issuer/audience, JTI, expiry and user authVersion. Tokens stay in HttpOnly SameSite cookies (Secure in production), never localStorage. The hashed session record and current database role/status are checked on each request. Logout/reset/disable revoke sessions. Public signup ignores role input. Operators grant administrator access through `npm run admin:grant -- your-account@example.com`. Email proof applies when email verification is enabled.
 
 Writes require application/json and X-SmartWall-Request: 1; cross-origin and cross-site requests fail. Validation restricts lengths, types, images, dimensions, masks, patterns, colours and quotas. Error responses use {error:message} with 4xx/5xx status. Private image reads check ownership; admin private review requires a reason/audit.
 
@@ -13,17 +13,17 @@ Writes require application/json and X-SmartWall-Request: 1; cross-origin and cro
 | Endpoint | Purpose/access |
 | --- | --- |
 | GET /api/health | MongoDB ping/stack status |
-| GET /api/auth/me | Current public account or null |
+| GET /api/auth/me | Current public account or null, plus email verification and password reset availability |
 | POST /api/auth/signup, /login, /logout | Credentials/session lifecycle |
 | POST /api/auth/forgot-password | Generic email response |
 | POST /api/auth/reset-password | Single-use token/password; session revocation |
 | POST /api/auth/resend-verification, /verify-email | Email proof and nominated-admin activation |
 | GET /api/catalog | Active colours, starter patterns and published patterns |
-| GET/POST /api/patterns | Browse; verified account publishes name/style/base/ink/scale |
+| GET/POST /api/patterns | Browse patterns and publish from an account. Email proof applies when verification is enabled. |
 | DELETE /api/patterns/:id | Owner only |
 | GET /api/account/stats | Own project/pattern counts |
 | GET/POST /api/account/favourites | Own list; write kind(colour/pattern), id, selected |
-| GET/POST /api/designs | Own summaries; verified account saves original/preview/state |
+| GET/POST /api/designs | List own designs and save original, preview and state. Email proof applies when verification is enabled. |
 | POST /api/designs/delete | Own IDs, at most 50 |
 | GET /api/designs/:id | Own full editable project |
 | GET /api/designs/:id/photo or /preview | Owner-checked private image |
@@ -52,6 +52,6 @@ Use one API/mail worker for the internship trial. Rate limits are per-process; m
 
 Environment variables are documented in .env.example. Development also loads ignored .env.local without overriding explicit process environment. Production uses service environment only. Gmail SMTP setup and delivery checks are documented in GMAIL_SETUP.md. Tests use isolated databases. npm run check:release checks the actual production launcher without provisioning hosting or delivering real email.
 
-## Internship scope
+## Account email
 
-Email flows are optional and disabled by default. The API reports emailEnabled in /api/auth/me; the UI hides email actions and account registration/saving/publishing do not require verification. Disabled email endpoints return 404 and no signup messages are queued. Password hashing, JWT session revocation, owner checks and explicit operator/admin roles remain enforced. To restore email features, set ENABLE_EMAIL_FEATURES=true and configure a sender.
+`ENABLE_PASSWORD_RESET=true` enables password recovery independently. `ENABLE_EMAIL_FEATURES=true` also enables signup verification and requires email proof before saving designs or publishing patterns. Both flags default to false locally. To test locally, enable the relevant flag in `.env.local`, restart the API, request an email and read it with `npm run mail:inbox`. The [Render guide](DEPLOYMENT-RENDER.md#password-reset-emails) covers the live Brevo configuration.

@@ -1,10 +1,10 @@
-# Free Render + MongoDB Atlas deployment
+# Deploy Palettè on Render
 
-Palettè runs on the [existing free Render service](https://dashboard.render.com/web/srv-dbmt4d3rjlhs73cdtmm0) with MongoDB Atlas. See the [live site](https://smart-wall-atharva1232.onrender.com/) and the [GitHub repository](https://github.com/atharva1232/Smart-Wall). The steps below document the original free-plan setup.
+The [live Palettè demo](https://smart-wall-atharva1232.onrender.com/) runs on Render Free with MongoDB Atlas. Use the [existing Render service](https://dashboard.render.com/web/srv-dbmt4d3rjlhs73cdtmm0) to manage that deployment. The following steps also apply to a new installation.
 
 ## Owner setup
 
-1. In your existing GitHub account, create a repository named smart-wall. Private is suitable while preparing. Initialise it with a README so it has a main branch. Share its normal repository URL, not a token. Give the GitHub connection and Render's GitHub integration access to that repository if requested. The code is ready to upload; do not upload .data, .backups, review, tmp, .env files or node_modules.
+1. Connect Render to the Git repository and branch that contain the application.
 2. Register/sign in at https://www.mongodb.com/cloud/atlas/register. Select the Free/M0 tier, not Flex or Dedicated, and a nearby supported region. Create a database user with a strong unique password and readWrite privileges limited to the smartwall database. Keep that password private.
 3. The Render service's outbound IP ranges are available on its dashboard. Allow those ranges in Atlas Network Access. Do not open Atlas to all IP addresses merely for convenience. Add your current IP temporarily only if doing a local connection/backup check.
 4. In Atlas Connect > Drivers, obtain the mongodb+srv connection string and replace its password placeholder locally. Paste it directly into the Render service's secret MONGODB_URI environment variable. Do not post it to chat, GitHub or a screenshot. Select database smartwall or let MONGODB_DATABASE supply the name. Database authentication credentials differ from the Atlas website account.
@@ -13,7 +13,7 @@ Palettè runs on the [existing free Render service](https://dashboard.render.com
 
 The repository-root render.yaml defines ONE service, explicitly plan: free, in Singapore. It uses root directory smart-wall, builds with npm ci --include=dev && npm run build && npm prune --omit=dev, and starts npm run start:production. The API serves the compiled Angular app and its private API on the same HTTPS origin. MongoDB/GridFS persist the rooms and accounts in Atlas, never on Render's disk.
 
-When creating via the Render connector instead of a Blueprint (which needs a public repository), use build command `cd smart-wall && npm ci --include=dev && npm run build && npm prune --omit=dev` and start command `cd smart-wall && npm run start:production`. Confirm plan free, region singapore, one instance and no paid resources.
+For a manually configured service, set the root directory to `smart-wall` and use the build and start commands above. If the root directory is the repository root, prefix both commands with `cd smart-wall &&`.
 
 Required service environment:
 
@@ -58,10 +58,4 @@ The cloud database starts empty; local accounts/photos have not been uploaded au
 
 Render Free sleeps after 15 idle minutes and wakes on a request; waking can take about a minute. Free hours, bandwidth and builds have monthly quotas. Atlas Free has limited storage, so use a small demo dataset. Keep the service and cluster available throughout evaluation and check the link periodically. No guarantee of uninterrupted availability is claimed.
 
-## Preparation validation
-
-The 53 backend tests cover complete image decoding, rejection of truncated original/preview content before media writes, matching photo/preview dimensions, explicit proxy trust and independent client rate limits. Existing password hashes are unchanged. Runtime image decoding and password hashing use conservative concurrency settings for the small free instance. Production dependencies were checked with npm audit --omit=dev; zero reported advisories at preparation time. A real cloud deploy, Atlas connection, proxy-chain check and restart/persistence checks remain pending until the owner account setup is complete.
-
-References checked 6 November 2026: https://render.com/docs/free, https://render.com/docs/environment-variables, https://render.com/docs/deploy-node-express-app, https://www.mongodb.com/docs/atlas/connect-to-database-deployment/.
-
-Startup now reuses identical MongoDB validators without collMod; a real schema change still requires an operator migration and fails rather than disabling validation. Current service auto-deploy is off while private configuration is completed. No duplicate service has been created.
+Startup reuses matching MongoDB validators. Changes to the schema require an operator migration. See the [database guide](DATABASE.md) for backup and restore procedures.

@@ -1,15 +1,15 @@
-# Internship requirement evidence — 2026-10-23
+# Internship implementation and evidence
 
-Source of truth: the eight supplied internship screenshots, transcribed in PRD.md. **Local implementation is ready for acceptance testing; the deployed-system deliverable is still pending.** Do not describe this as a live production deployment or a completed real-user trial.
+The [product requirements](PRD.md) capture the supplied internship brief. The [public demo](https://smart-wall-atharva1232.onrender.com/) runs on Render with MongoDB Atlas.
 
 | Requirement | Implementation/evidence | State |
 | --- | --- | --- |
 | MEAN stack | Angular 22, Express 5, MongoDB replica set/GridFS, Node 24; active mean-api.mjs entrypoint | Implemented locally |
 | REST + JWT | Fixed algorithm/issuer/audience, HttpOnly cookies, hashed revocable sessions; API tests | Implemented/tested |
-| Registration/login/user/admin roles | Password hashes, login/logout, server role checks and operator-only admin grants; email extras disabled | Implemented/tested |
+| Registration/login/user/admin roles | Password hashes, login/logout, server role checks and operator-only admin grants | Implemented/tested |
 | Real room JPG/PNG upload | JPG/PNG/WebP up to 15 MB; image/header/size/mask validation; original photo retained | Implemented |
 | Manual selection | Polygon boundary plus edge-aware surface selection, erase/restore, tolerance, undo and keyboard controls | Implemented |
-| Paint and basic designs | Solid colours and 11 repeating motif styles on uploaded room photos; wall-mask clipping | Implemented/tested |
+| Paint and basic designs | Solid colours, built-in motifs and uploaded textures clipped to each selected wall | Implemented/tested |
 | Dual-tone walls | Horizontal/vertical two-colour division and adjustable split, clipped to selected wall | Implemented/tested |
 | Opacity/realistic impression | Paint strength, retained source shading and illustrative Matte/Satin/Gloss response | Implemented; not physical simulation |
 | Before/after | Original/painted comparison in editor | Implemented |
@@ -30,30 +30,26 @@ Source of truth: the eight supplied internship screenshots, transcribed in PRD.m
 | Database schema | DATABASE.md; actual schema validators/indexes and collection relationships | Delivered |
 | PRD | PRD.md | Delivered |
 | User documentation | How to use Palettè page in footer; task instructions and FAQ | Delivered |
-| Developer documentation | README.md, BACKEND.md, DATABASE.md, DEPLOYMENT-AWS.md, environment example | Delivered |
+| Developer documentation | [README](../README.md), [API](BACKEND.md), [database](DATABASE.md), [deployment](DEPLOYMENT-RENDER.md) and [environment template](.env.example) | Delivered |
 | Upload/save/session/satisfaction KPIs | Admin overview refreshes every 15s; 90-day events, active-visit estimate, private ratings | Implemented; metric definitions disclosed |
-| Cloud deployment with domain | Dockerfile and AWS ECS/Atlas guide prepared | **Pending accounts, cost approval and actual deployment** |
-| Real verification/recovery email | Optional Gmail/Resend adapters retained but disabled by default; registration/saving/publishing work without email | Outside the explicit internship requirements; deferred |
-| High service availability | Local health/production startup checks; cloud guide | **Pending live infrastructure, monitoring and operating evidence** |
+| Cloud deployment with domain | Render Free web service with public HTTPS and MongoDB Atlas | Deployed |
+| Password recovery email | Brevo sends reset links independently of signup verification | Deployed and confirmed by the project owner on 12 November 2026 |
+| Service availability | Public health endpoint and free hosting | Extended availability and production recovery testing remain unverified |
 
 ## Acceptance evidence
 
 - Production Angular build passes.
-- Frontend suite: 35 tests; backend suites: 46 tests, including real MongoDB integration and retained SQLite migration regressions.
+- Release checks on 10 November 2026 passed 39 frontend and 58 backend tests, including MongoDB integration and SQLite migration regressions.
 - Production launcher smoke check: compiled app/CSS, private paths, unauthorised photo routes, cross-origin writes and initial backup pass. No actual email is sent by this check.
 - MongoDB backup/empty-database restore drill checks accounts, saved appearance and original-photo GridFS chunks. The production off-host recovery drill remains a launch task.
 - Browser QA used a disposable administrator/database on localhost, separate from the owner's 127.0.0.1 cookies. Created a shade through admin, saw it in the public catalogue, saved a patterned room, refreshed/reopened it, reviewed it through reasoned admin access and checked tablet layouts. Disposable database/account removed afterwards.
 - Migration verification preserved the one existing account/password hash. The legacy SQLite database contained zero account-saved projects; two browser guest saves remain in IndexedDB and were not deleted/imported automatically. SQLite source retained.
 - Screenshots and benchmark/migration diagnostics are private ignored files under review/. They are engineering evidence, not participant feedback.
 
-## Owner actions still required
+## Remaining evaluation
 
-1. The nominated existing admin account has been granted administrator access. Future local operator grants use `npm run admin:grant -- atharvap3212@gmail.com`; email verification is not required in the default internship build. Public signup cannot assign admin roles.
-2. Set up the cloud/database deployment accounts and review costs. Follow DEPLOYMENT-AWS.md. No external resources have been provisioned.
-3. Deploy HTTPS, record the public URL, verify persistence across redeployment and arrange backups/monitoring checks.
-4. Conduct the USER_TRIAL.md desktop/tablet trial, record actual results, fix blockers and assemble the final demonstration/report.
-
-Email verification and password-reset delivery are optional extras, disabled by default. They are not submission blockers. No existing account is falsely marked email-verified. If explicitly enabled later with ENABLE_EMAIL_FEATURES=true, the original email proof gates return.
+- Verify that disposable saved designs survive a cloud redeploy and document an off-host backup and restore drill.
+- Record participant outcomes if running the optional [desktop and tablet trial](USER_TRIAL.md).
 
 ## Explicitly not missing from Phase 1
 
@@ -66,9 +62,3 @@ Use one API/mail worker for the trial. Multiple instances require distributed ra
 ## Pattern upload follow-up
 
 Added visible built-in tiles, a Patterns-page “Try on my photo” shortcut, explicit wall-selection guidance and a manual outlined-wall fill option. Pattern choices now leave Original comparison mode automatically. Custom raster uploads repeat within the wall mask with adjustable repeat size/transparency and persist in saved projects. Browser verification used a room uploaded through the file chooser (not the guided sample) and a generated QA tile. No real user designs were deleted or published.
-
-## Scope clarification after checking the supplied brief
-
-Required deliverables are the functioning MEAN application, user/admin workflows, database schema, PRD, end-user/developer documentation, analytics dashboard and public cloud deployment with a domain. The local implementation and documentation exist; public deployment and demonstrated availability remain pending. Final deployed end-to-end checks are needed before claiming the deployed system is complete.
-
-Gmail linking, email verification and email password recovery are not explicitly required in the supplied brief. They remain optional and disabled. A 3–5 participant study, video and separate final report are useful submission evidence, but the supplied screenshots do not expressly prescribe those artifacts or a participant count. Confirm any additional submission format with the internship portal or mentor. Do not describe these suggested activities as additional mandatory product requirements.

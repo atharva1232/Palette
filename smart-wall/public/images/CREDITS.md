@@ -5,5 +5,6 @@
 - `living-room.jpg`: [dix sept — gray cushion couch beside white wall](https://unsplash.com/photos/gray-cushion-couch-beside-white-wall-qY3pLOIpt4w), via Unsplash.
   Source: https://images.unsplash.com/photo-1624351231514-aa7a3189d9cf
 
-Both photo pages identify the images as free to use under the [Unsplash License](https://unsplash.com/license).
-The accent-wall preview adds an approximate, manually masked colour/pattern overlay. It is not automatic wall segmentation or a calibrated paint simulation.
+These two photos are available under the [Unsplash License](https://unsplash.com/license).
+
+Source and permission records are pending for `classic-patterned-living-room.jpg` and `sky-effect-bedroom.jpg`.
