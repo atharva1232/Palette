@@ -149,6 +149,7 @@
       @if (controlTab === 'patterns') {
         <section class="wall-pattern-studio" aria-label="Wall patterns">
           <h3>Dress up your wall.</h3><p>Choose a ready-made design or upload a wallpaper/pattern image.</p>
+          <p>For angled walls, mark the four main corners for the best pattern fit. Use a separate outline for each wall.</p>
           @if (!hasSelection()) {
             <div class="pattern-selection-help" role="status"><strong>Select your wall to see the pattern.</strong><p>Outline the wall in your photo, then use Smart select or apply to the outlined area. Furniture inside your outline can be protected with Erase.</p>
               @if (boundaryReady()) { <button type="button" class="action-button primary-action" (click)="useOutlinedWall()">Apply to my outlined wall</button> }

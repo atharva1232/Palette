@@ -4,6 +4,7 @@ import { patternBackground, starterPatterns } from './catalog';
 import { Catalogue } from './catalogue';
 import { Activity } from './activity';
 import { PaintStyle, styledPaint, textureBytes } from './paint-style';
+import { wallProjection } from './wall-perspective';
 import { Point, imagePoint, validatePhoto, selectWallRegion, constrainWallMask } from './paint-engine';
 import { Auth } from './auth';
 import { DesignGallery } from './design-gallery';
@@ -533,7 +534,9 @@ export class Visualizer implements OnDestroy {
       if (!wallMask) continue;
       const design = wall?.design;
       const appearance = design ? design.appearance ?? defaultPaintStyle() : this.appearance;
-      styledPaint(this.source.data, wallMask, this.imageWidth(), design?.color ?? this.color, design?.strength ?? this.strength, appearance, pixels);
+      const outlines = design?.polygons ?? this.polygons;
+      const projection = appearance.mode === 'pattern' ? wallProjection(outlines.flat()) : undefined;
+      styledPaint(this.source.data, wallMask, this.imageWidth(), design?.color ?? this.color, design?.strength ?? this.strength, appearance, pixels, projection);
     }
     const painted = new ImageData(pixels, this.imageWidth(), this.imageHeight());
     output.putImageData(painted, 0, 0);

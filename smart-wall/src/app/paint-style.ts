@@ -1,4 +1,5 @@
 import { WallPattern } from './catalog';
+import type { WallProjection } from './wall-perspective';
 export interface PaintStyle {
   mode: 'solid' | 'dual' | 'pattern';
   secondary: string;
@@ -20,7 +21,7 @@ export function motif(style: string, x: number, y: number, scale: number): boole
   const u = ((x % scale) + scale) % scale / scale, v = ((y % scale) + scale) % scale / scale;
   switch (style) {
     case 'Stripes': return u >= .5;
-    case 'Diagonal': return ((x + y) % scale) / scale >= .5;
+    case 'Diagonal': return ((u + v) % 1) >= .5;
     case 'Dots': return Math.hypot(u - .5, v - .5) < .22;
     case 'Grid': return u < .04 || v < .04;
     case 'Checkerboard': return (u < .5) !== (v < .5);
@@ -33,26 +34,31 @@ export function motif(style: string, x: number, y: number, scale: number): boole
     default: return false;
   }
 }
-export function styledPaint(source: Uint8ClampedArray, mask: Uint8Array, width: number, colour: string, strength: number, style: PaintStyle, output = new Uint8ClampedArray(source)): Uint8ClampedArray<ArrayBuffer> {
+export function styledPaint(source: Uint8ClampedArray, mask: Uint8Array, width: number, colour: string, strength: number, style: PaintStyle, output = new Uint8ClampedArray(source), project?: WallProjection): Uint8ClampedArray<ArrayBuffer> {
   const height = mask.length / width;
   const rgb = (hex: string) => [1,3,5].map(i => parseInt(hex.slice(i,i+2),16));
   const main = rgb(style.mode === 'pattern' ? style.pattern.base : colour);
   const accent = rgb(style.mode === 'pattern' ? style.pattern.ink : style.secondary);
   const texture = style.mode === 'pattern' && style.patternSource === 'upload' ? style.texture : undefined;
   const tile = texture ? textureBytes(texture) : undefined;
+  const repeatHeight = texture ? texture.scale * texture.height / texture.width : 0;
+  const patternPoint = { x: 0, y: 0 };
   let total = 0, weight = 0;
   for (let p=0;p<mask.length;p++) { total += (.2126*source[p*4]+.7152*source[p*4+1]+.0722*source[p*4+2])*mask[p]; weight += mask[p]; }
   if (!weight) return output;
   for (let p=0;p<mask.length;p++) {
     if (!mask[p]) continue;
     const x=p%width,y=Math.floor(p/width),i=p*4;
-    const useAccent = style.mode === 'pattern' ? motif(style.pattern.style,x,y,style.pattern.scale) : style.mode === 'dual' && (style.direction === 'horizontal' ? y/height : x/width) >= style.split/100;
+    patternPoint.x = x;
+    patternPoint.y = y;
+    project?.(x, y, patternPoint);
+    const useAccent = style.mode === 'pattern' ? !tile && motif(style.pattern.style, patternPoint.x, patternPoint.y, style.pattern.scale) : style.mode === 'dual' && (style.direction === 'horizontal' ? y/height : x/width) >= style.split/100;
     let target = useAccent ? accent : main;
     let tileAlpha = 1;
     if (texture && tile) {
-      const repeatHeight = texture.scale * texture.height / texture.width;
-      const tx = Math.floor((x % texture.scale) / texture.scale * texture.width);
-      const ty = Math.floor((y % repeatHeight) / repeatHeight * texture.height);
+      const tileX = patternPoint.x / texture.scale, tileY = patternPoint.y / repeatHeight;
+      const tx = Math.floor((tileX - Math.floor(tileX)) * texture.width);
+      const ty = Math.floor((tileY - Math.floor(tileY)) * texture.height);
       const index = (ty * texture.width + tx) * 4;
       target = [tile[index], tile[index+1], tile[index+2]];
       tileAlpha = tile[index+3] / 255;
