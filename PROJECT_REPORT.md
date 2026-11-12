@@ -10,7 +10,15 @@ Palettè is a web application for previewing paint on a photo of a real room. Us
 
 ## Problem and objectives
 
-A colour chip shows paint in isolation. Wall geometry, nearby furniture and room lighting make it difficult to judge how the same colour will look at home. Palettè lets users compare several options on the same photo before choosing a physical sample. The internship brief also calls for an editable project workflow, user and administrator roles, catalogue management and a public cloud demo. The [product requirements](smart-wall/PRD.md) describe the full scope.
+A colour chip shows paint in isolation. Wall geometry, nearby furniture and room lighting make it difficult to judge how the same colour will look at home. Palettè lets users compare several options on the same photo before choosing a physical sample. Homeowners and renters are the primary users. Interior designers and painters can also use the preview to discuss options with clients.
+
+The project focused on three outcomes:
+
+- Let users recolour individual walls while preserving the rest of the room photo.
+- Make comparisons repeatable by saving editable versions and exporting a preview.
+- Deliver an end-to-end web application with account access, catalogue administration and a public cloud demo.
+
+Automatic wall detection, live camera previews and paint purchasing were outside the internship scope. The [product requirements](smart-wall/PRD.md) describe the full brief.
 
 ## User workflow
 
@@ -32,15 +40,26 @@ The **Shades** and **Patterns** pages offer browsable catalogues. Signed-in user
 | Local storage | IndexedDB stores guest designs on the current browser. A signed-in user can explicitly import local designs into their account. |
 | Hosting and mail | Render hosts the web service, Atlas provides persistent storage and Brevo sends password reset emails over HTTPS. |
 
-The renderer uses a mask to limit paint to each wall. Source shading remains visible through the paint effect, while the original photo stays available for comparison. For a two-tone design, the selected direction and split position determine which colour applies inside the mask. Pattern rendering repeats a built-in motif or a user-provided texture inside the same boundary. Custom uploads are resized locally into repeatable tiles.
+### Wall selection and rendering
 
-An account save associates the original photo and rendered preview with the owner and records the masks and appearance settings needed to reopen the design. A saved project includes an appearance snapshot so a catalogue edit or archive does not remove its styling. The [API guide](smart-wall/BACKEND.md) and [database guide](smart-wall/DATABASE.md) provide implementation details.
+1. **Set the boundary.** The editor converts the user's outline into a pixel mask. Pointer coordinates are mapped from the displayed canvas to image pixels, so the same selection works when the preview is resized.
+2. **Refine the region.** Smart select starts from a point on the wall and checks neighbouring pixels for colour similarity and strong brightness changes. It stays inside the outline. The erase tool protects selected areas, such as a picture frame, from being painted again when the user adjusts the tolerance.
+3. **Render the preview.** The paint is blended with the original pixels according to paint strength and local brightness, which preserves visible shadows. Two-tone paint divides the wall along the selected direction and position. Patterns repeat inside the same wall mask. The browser resizes uploaded pattern images into tiles up to 256 pixels on either side.
+4. **Compare and export.** The editor keeps the original photo available for before-and-after comparison. The PNG export uses the painted result with the same wall boundaries and protected areas.
+
+### Saving and reopening designs
+
+Guest designs stay in IndexedDB. For an account save, the API validates the design and image data, then stores the original photo and painted PNG in GridFS. The project record links those files to the owner and stores the wall masks, paint settings and pattern choices. When a project is reopened, the editor uses this saved state to reconstruct the design. Saving a snapshot of the appearance lets users reopen it after a catalogue item is edited or archived.
+
+The server checks ownership when listing, opening or deleting saved designs. An account can store up to 50 designs or 256 MB. A database transaction records the project and updates the account quota together, and the API recognises a repeated save with the same design ID. The [API guide](smart-wall/BACKEND.md) and [database guide](smart-wall/DATABASE.md) provide implementation details.
 
 ## Security and administration
 
 The backend hashes passwords with scrypt and uses signed JWT sessions in HttpOnly cookies. It checks roles and project ownership on the server. Password resets invalidate existing sessions, and reset links expire after 30 minutes and can be used once. The API validates uploaded images, checks storage limits and restricts access to saved photos.
 
 Administrators can add, edit or archive catalogue entries, manage eligible user accounts and review feedback. Reviewing a private design requires a reason and creates an audit record. The activity dashboard reports photo loads, saved designs, estimated active time and feedback ratings. Photo load totals include samples and reopened designs, and active time is estimated from activity signals.
+
+Password recovery is enabled on the live demo independently of signup verification. A reset request returns the same generic response for registered and unregistered addresses to protect account privacy. Brevo delivers the link for registered accounts.
 
 ## Testing and results
 
@@ -53,6 +72,8 @@ Administrators can add, edit or archive catalogue entries, manage eligible user 
 | Public deployment and recovery | The live service responded to its health check, and the project owner confirmed receiving and using the deployed password reset flow on 12 November 2026. |
 
 The [implementation checklist](smart-wall/REQUIREMENTS.md) maps features and evidence to the internship brief.
+
+The browser checks used disposable accounts and sample data. They show that the tested workflows could be completed, but provide no participant satisfaction scores. A follow-up evaluation can record which steps users complete without help and where they have difficulty, particularly around wall boundaries and reopening a design.
 
 ## Deployment and demonstration
 
